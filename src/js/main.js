@@ -34,7 +34,7 @@ dracoLoader.setDecoderPath('draco/')
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader)
 
-const mainGltf = await gltfLoader.loadAsync( "./assets/gltf-main-merge.glb" );
+const mainGltf = await gltfLoader.loadAsync( "/gltf-main-merge.glb" );
 console.log(mainGltf)
 
 
