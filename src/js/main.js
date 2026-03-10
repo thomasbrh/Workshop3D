@@ -33,6 +33,24 @@ dracoLoader.setDecoderPath('/draco/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
 
+// Texture loader + loadingManager
+const loadingManager = new THREE.LoadingManager()
+const textureLoader = new THREE.TextureLoader(loadingManager)
+
+
+/**
+ * Texturing
+ */
+const bakedTexture = textureLoader.load('/baked.webp')
+bakedTexture.flipY = false
+bakedTexture.colorSpace = THREE.SRGBColorSpace
+
+console.log(bakedTexture)
+
+// Create material for gltf
+const bakedMaterial = new THREE.MeshStandardMaterial({ map: bakedTexture })
+
+
 
 
 /** 
@@ -45,7 +63,6 @@ class Viewer {
         this.canvas = options.canvas;
 
         this.setRenderer(options);
-        
     }
 
 
@@ -54,9 +71,11 @@ class Viewer {
      * loading model gltf
      */
     async loadModel() {
-        const mainGltf = await gltfLoader.loadAsync('/gltf-main-merge.glb')
-        console.log(mainGltf)
+        const mainGltf = await gltfLoader.loadAsync('/gltf-main-texture.glb')
+
         this.scene.add(mainGltf.scene)
+        console.log(mainGltf)
+
         this.render()
     }
 
@@ -142,8 +161,7 @@ class Viewer {
      */
     populate() {
         // Tout les éléments à ajouter dans la scene
-        /* this.scene.add(mainGltf.scene); */
-
+        // lumière ambiante
         const sunLight = new THREE.AmbientLight('white', 0.75)
 
         this.scene.add( sunLight );
@@ -188,16 +206,16 @@ class Viewer {
             75, 
             settings.sizes.w / settings.sizes.h, // On le calcule avec la taille du wrapper
             0.01, // valeur min pour ne pas traverser les objets
-            100
+            275
         );
 
         // OrbitControls
-        /* this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         this.controls.addEventListener( 'change', () => 
         {
             this.render();
         } 
-        ); */
+        );
 
         // Recule notre camera pour qu'on puisse voir le centre de la scene
         this.camera.position.set( 0, 1.2, 1.8) // x, y, z
@@ -248,7 +266,7 @@ class Viewer {
  * myViewer
  */
 const myViewer = new Viewer(threejsOptions);
-/* myViewer.addGizmo(2); */
+myViewer.addGizmo(2);
 
 // Ajouter un event resize et appeler la fonction qui gère les changements de tailles
 window.addEventListener("resize", () => {
@@ -260,7 +278,7 @@ window.addEventListener("resize", () => {
 /** 
  * Event tracking camera
  */
-window.addEventListener("click", () => {
+/* window.addEventListener("click", () => {
     myViewer.indexCamera++;
     const length = myViewer.cameraPositions.length;
     gsap.to( myViewer.camera.position, {
@@ -275,7 +293,7 @@ window.addEventListener("click", () => {
     });
     myViewer.camera.lookAt(0, 0, 0.5);
     myViewer.render();
-});
+}); */
 
 
 
