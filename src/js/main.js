@@ -34,7 +34,7 @@ dracoLoader.setDecoderPath('draco/')
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader)
 
-const mainGltf = await gltfLoader.loadAsync( "./assets/gltf-main-merge.glb" );
+const mainGltf = gltfLoader.loadAsync( "./assets/gltf-main-merge.glb" );
 console.log(mainGltf)
 
 
@@ -180,17 +180,17 @@ class Viewer {
             75,
             // On le calcule avec la taille du wrapper
             settings.sizes.w / settings.sizes.h,
-            1,
+            0.01, // valeur min pour ne pas traverser les objets
             100
         );
 
         // OrbitControls
-        /* this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         this.controls.addEventListener( 'change', () => 
         {
             this.render();
         } 
-        ); */
+        );
 
         // Recule notre camera pour qu'on puisse voir le centre de la scene
         this.camera.position.set( 0, 1.2, 1.8) // x, y, z
@@ -252,7 +252,7 @@ window.addEventListener("resize", () => {
 /** 
  * Event tracking camera
  */
-window.addEventListener("click", () => {
+/* window.addEventListener("click", () => {
     myViewer.indexCamera++;
     const length = myViewer.cameraPositions.length;
     gsap.to( myViewer.camera.position, {
@@ -267,7 +267,7 @@ window.addEventListener("click", () => {
     });
     myViewer.camera.lookAt(0, 0, 0.5);
     myViewer.render();
-});
+}); */
 
 
 
