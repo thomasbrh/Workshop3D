@@ -21,22 +21,23 @@ const threejsOptions = {
 };
 
 
+/**
+ * Loader
+ */
+
+// Draco loader
+const dracoLoader = new DRACOLoader()
+dracoLoader.setDecoderPath('/draco/')
+
+// Gltf loader
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
+
+
 
 /** 
  * VIEWER CLASS
  */
-// Loader
-// Draco loader
-const dracoLoader = new DRACOLoader()
-dracoLoader.setDecoderPath('draco/')
-
-// GLTF loader
-const gltfLoader = new GLTFLoader();
-gltfLoader.setDRACOLoader(dracoLoader)
-
-const mainGltf = await gltfLoader.loadAsync( "/gltf-main-merge.glb" );
-console.log(mainGltf)
-
 
 // viewer class
 class Viewer {
@@ -44,10 +45,25 @@ class Viewer {
         this.canvas = options.canvas;
 
         this.setRenderer(options);
+        
     }
 
+
+
     /**
-     * Tracking camera
+     * loading model gltf
+     */
+    async loadModel() {
+        const mainGltf = await gltfLoader.loadAsync('/gltf-main-merge.glb')
+        console.log(mainGltf)
+        this.scene.add(mainGltf.scene)
+        this.render()
+    }
+
+
+
+    /**
+     * Tracking and travelling camera
      */
     updateCameraPosition() {
         const newPosition = this.cameraPositions[ this.indexCamera ];
@@ -73,21 +89,21 @@ class Viewer {
         cam1.position.x = 0.5;
         cam1.position.y = 1.5;
         cam1.position.z = 1.9;
-        /* cam1.visible = true; */
+        cam1.visible = false; 
 
         const cam2 = new THREE.Mesh( geometry, material );
 
         cam2.position.x = -0.5;
         cam2.position.y = 0.8;
         cam2.position.z = 1.9;
-        /* cam2.visible = true; */
+        cam2.visible = false;
 
         const cam3 = new THREE.Mesh( geometry, material );
 
         cam3.position.x = 0.5;
         cam3.position.y = 0;
         cam3.position.z = 1.9;
-        /* cam3.visible = true; */
+        cam3.visible = false;
 
         this.cameraPositions.push(cam1.position, cam2.position, cam3.position);
         
@@ -100,21 +116,21 @@ class Viewer {
         lookAt1.position.x = 0.5;
         lookAt1.position.y = 1.5;
         lookAt1.position.z = 0.5;
-        /* lookAt1.visible = true; */
+        lookAt1.visible = false;
 
         const debug2 = new THREE.Mesh( geometry, material );
 
         debug2.position.x = -0.5;
         debug2.position.y = 0.8;
         debug2.position.z = 1.9;
-        /* debug2.visible = true; */
+        debug2.visible = false;
 
         const debug3 = new THREE.Mesh( geometry, material );
 
         debug3.position.x = 0.5;
         debug3.position.y = 0;
         debug3.position.z = 1.9;
-        /* debug3.visible = true; */
+        debug3.visible = false;
 
         this.scene.add( lookAt1, debug2, debug3 );
     }
@@ -126,15 +142,7 @@ class Viewer {
      */
     populate() {
         // Tout les éléments à ajouter dans la scene
-        this.scene.add(mainGltf.scene);
-
-        // géométrie de test
-        // const geometry = new THREE.BoxGeometry(1, 1, 1);
-        // const material = new THREE.MeshBasicMaterial({
-        //     color: "slateblue",
-        // });
-        // const mesh = new THREE.Mesh(geometry, material);
-        // this.scene.add(mesh);
+        /* this.scene.add(mainGltf.scene); */
 
         const sunLight = new THREE.AmbientLight('white', 0.75)
 
@@ -177,20 +185,19 @@ class Viewer {
         // Crée notre caméra
         // PerspectiveCamera( fov, aspect-ratio, near, far )
         this.camera = new THREE.PerspectiveCamera(
-            75,
-            // On le calcule avec la taille du wrapper
-            settings.sizes.w / settings.sizes.h,
+            75, 
+            settings.sizes.w / settings.sizes.h, // On le calcule avec la taille du wrapper
             0.01, // valeur min pour ne pas traverser les objets
             100
         );
 
         // OrbitControls
-        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+        /* this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         this.controls.addEventListener( 'change', () => 
         {
             this.render();
         } 
-        );
+        ); */
 
         // Recule notre camera pour qu'on puisse voir le centre de la scene
         this.camera.position.set( 0, 1.2, 1.8) // x, y, z
@@ -204,7 +211,8 @@ class Viewer {
         this.resize();
 
 
-        // Appele la fonction d'ajout d'éléments
+        // Appele les fonctions d'ajout d'éléments
+        this.loadModel();
         this.travelling();
         this.populate();
     }
@@ -252,7 +260,7 @@ window.addEventListener("resize", () => {
 /** 
  * Event tracking camera
  */
-/* window.addEventListener("click", () => {
+window.addEventListener("click", () => {
     myViewer.indexCamera++;
     const length = myViewer.cameraPositions.length;
     gsap.to( myViewer.camera.position, {
@@ -267,7 +275,7 @@ window.addEventListener("resize", () => {
     });
     myViewer.camera.lookAt(0, 0, 0.5);
     myViewer.render();
-}); */
+});
 
 
 
