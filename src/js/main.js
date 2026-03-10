@@ -10,14 +10,18 @@ import GUI from 'lil-gui'
  * SETTINGS
  */
 const settings = {
+
     wrapper: document.querySelector(".js-canvas-wrapper"),
     canvas: document.querySelector(".js-canvas-3d"),
     raf: window.requestAnimationFrame,
     sizes: {},
+
 };
 
 const threejsOptions = {
+
     canvas: settings.canvas,
+
 };
 
 
@@ -29,9 +33,11 @@ const threejsOptions = {
 const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('/draco/')
 
+
 // Gltf loader
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
+
 
 // Texture loader + loadingManager
 const loadingManager = new THREE.LoadingManager()
@@ -47,6 +53,7 @@ bakedTexture.colorSpace = THREE.SRGBColorSpace
 
 console.log(bakedTexture)
 
+
 // Create material for gltf
 const bakedMaterial = new THREE.MeshStandardMaterial({ map: bakedTexture })
 
@@ -60,9 +67,11 @@ const bakedMaterial = new THREE.MeshStandardMaterial({ map: bakedTexture })
 // viewer class
 class Viewer {
     constructor(options) {
+
         this.canvas = options.canvas;
 
         this.setRenderer(options);
+
     }
 
 
@@ -71,87 +80,77 @@ class Viewer {
      * loading model gltf
      */
     async loadModel() {
-        const mainGltf = await gltfLoader.loadAsync('/gltf-main-texture.glb')
+
+        const mainGltf = await gltfLoader.loadAsync('/gltf-main-merge.glb')
 
         this.scene.add(mainGltf.scene)
         console.log(mainGltf)
 
         this.render()
+
     }
 
 
 
     /**
      * Tracking and travelling camera
-     */
+     */   
     updateCameraPosition() {
-        const newPosition = this.cameraPositions[ this.indexCamera ];
-        this.camera.position.set( newPosition.x, newPosition.y, newPosition.z );
-        this.camera.lookAt(0,0,0);
+
+        const data = this.camerasData[this.indexCamera];
+
+        if (!data) return;
+
+        this.camera.position.copy(data.position);
+
+        this.controls.target.copy(data.target);
+        this.controls.update();
+
     }
-    
+
+
+
     travelling() {
 
         this.indexCamera = 0;
-        this.cameraPositions = [];
 
-        const geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5);
-        const material = new THREE.MeshBasicMaterial({
-            color: 'crimson'
-        });
+        this.camerasData = [
+            {
+                // main camera
+                position: new THREE.Vector3(0, 0.75, 5),
+                target: new THREE.Vector3(0, -0.75, 0)
+            },
+            
+            {
+                // scène 1
+                position: new THREE.Vector3(-0.8, 1.6, 0.6),
+                target: new THREE.Vector3(3.5, -0.5, -2.5)
+                // position: new THREE.Vector3(0.8, 1.6, 0.4),
+                // target: new THREE.Vector3(-3, -2, -2.5)
+            },
+            
+            {
+                // scène 2
+                position: new THREE.Vector3(-0.4, 0.8, 0.8),
+                target: new THREE.Vector3(-0.2, 0.1, -1)
+            },
 
+            {
+                // scène 3
+                position: new THREE.Vector3(0.4, -0.2, 0.8),
+                target: new THREE.Vector3(0.5, -0.2, -0.5)
+            },
 
-        /**
-         * Camera positions debug
-         */
-        const cam1 = new THREE.Mesh( geometry, material );
-        cam1.position.x = 0.5;
-        cam1.position.y = 1.5;
-        cam1.position.z = 1.9;
-        cam1.visible = false; 
+            {
+                // scène 4
+                position: new THREE.Vector3(0.4, -0.8, 0.8),
+                target: new THREE.Vector3(-0.2, -1.5, -1)
+            }
+        ];
 
-        const cam2 = new THREE.Mesh( geometry, material );
-
-        cam2.position.x = -0.5;
-        cam2.position.y = 0.8;
-        cam2.position.z = 1.9;
-        cam2.visible = false;
-
-        const cam3 = new THREE.Mesh( geometry, material );
-
-        cam3.position.x = 0.5;
-        cam3.position.y = 0;
-        cam3.position.z = 1.9;
-        cam3.visible = false;
-
-        this.cameraPositions.push(cam1.position, cam2.position, cam3.position);
-        
-        this.scene.add( cam1, cam2, cam3 );
         this.updateCameraPosition();
         this.render();
 
-
-        const lookAt1 = new THREE.Mesh( geometry, material );
-        lookAt1.position.x = 0.5;
-        lookAt1.position.y = 1.5;
-        lookAt1.position.z = 0.5;
-        lookAt1.visible = false;
-
-        const debug2 = new THREE.Mesh( geometry, material );
-
-        debug2.position.x = -0.5;
-        debug2.position.y = 0.8;
-        debug2.position.z = 1.9;
-        debug2.visible = false;
-
-        const debug3 = new THREE.Mesh( geometry, material );
-
-        debug3.position.x = 0.5;
-        debug3.position.y = 0;
-        debug3.position.z = 1.9;
-        debug3.visible = false;
-
-        this.scene.add( lookAt1, debug2, debug3 );
     }
 
 
@@ -160,6 +159,7 @@ class Viewer {
      * populate
      */
     populate() {
+
         // Tout les éléments à ajouter dans la scene
         // lumière ambiante
         const sunLight = new THREE.AmbientLight('white', 0.75)
@@ -168,6 +168,7 @@ class Viewer {
 
         // Demander un rendu
         this.render();
+
     }
 
 
@@ -176,16 +177,20 @@ class Viewer {
      * Gizmo
      */
     removeGizmo() {
+
         this.scene.remove(this.gizmo);
         this.gizmo.dispose();
         this.gizmo = null;
         this.render();
+
     }
 
     addGizmo(size = 1) {
+
         this.gizmo = new THREE.AxesHelper(size);
         this.scene.add(this.gizmo);
         this.render();
+
     }
 
 
@@ -194,10 +199,13 @@ class Viewer {
      * Render
      */
     render(scene = this.scene, camera = this.camera) {
+
         this.renderer.render(scene, camera);
+
     }
 
     setRenderer(options = {}) {
+
         this.renderer = new THREE.WebGLRenderer(options);
 
         // Crée notre caméra
@@ -233,6 +241,7 @@ class Viewer {
         this.loadModel();
         this.travelling();
         this.populate();
+
     }
 
 
@@ -240,6 +249,7 @@ class Viewer {
      * resize
      */
     resize() {
+
         // Mettre à jour nos settings
         settings.sizes.w = settings.wrapper.clientWidth;
         settings.sizes.h = settings.wrapper.clientHeight;
@@ -258,6 +268,7 @@ class Viewer {
         this.renderer.setPixelRatio(settings.sizes.dpr);
 
         this.render();
+
     }
 }
 
@@ -270,61 +281,118 @@ myViewer.addGizmo(2);
 
 // Ajouter un event resize et appeler la fonction qui gère les changements de tailles
 window.addEventListener("resize", () => {
-    myViewer.resize();
-});
 
+    myViewer.resize();
+
+});
 
 
 /** 
  * Event tracking camera
  */
-/* window.addEventListener("click", () => {
-    myViewer.indexCamera++;
-    const length = myViewer.cameraPositions.length;
-    gsap.to( myViewer.camera.position, {
+window.addEventListener("keydown", () => {
+
+    if (event.key !== "e") return;
+
+    const length = myViewer.camerasData.length;
+    myViewer.indexCamera = (myViewer.indexCamera + 1) % length;
+
+    const data = myViewer.camerasData[myViewer.indexCamera];
+
+    if (!data) return;
+
+    gsap.to(myViewer.camera.position, {
+
         duration: 1,
-        x: myViewer.cameraPositions[ myViewer.indexCamera % length ].x,
-        y: myViewer.cameraPositions[ myViewer.indexCamera % length ].y,
-        z: myViewer.cameraPositions[ myViewer.indexCamera % length ].z,
+
+        x: data.position.x,
+        y: data.position.y,
+        z: data.position.z,
+
         onUpdate: () => {
-            myViewer.camera.lookAt(0, 0, 0.5);
+
+            myViewer.controls.target.copy(data.target);
+            myViewer.controls.update();
             myViewer.render();
+
         }
+
     });
-    myViewer.camera.lookAt(0, 0, 0.5);
-    myViewer.render();
-}); */
+
+});
 
 
 
 /** 
- * Debug Pane
+ * Debug
  */
 const pane = new Pane();
 
 // remettre en tweakpane 
 const debugObject = {
+
     camera: myViewer.camera
+
 }
 
-const gui = new GUI({ width: 400 })
+const gui = new GUI({ 
+    name: 'debug',
+    width: 400
+})
 
+// debug camera
 const cameraFolder = gui.addFolder('Camera')
 
 cameraFolder.add(debugObject.camera.position, 'x').min(-10).max(200).step(0.1)
 .onChange(() => {
+
     myViewer.render()
     console.log(myViewer.camera.position)
+
 })
 
 cameraFolder.add(debugObject.camera.position, 'y').min(-10).max(200).step(0.1)
 .onChange(() => {
+
     myViewer.render()
     console.log(myViewer.camera.position)
+
 })
 
 cameraFolder.add(debugObject.camera.position, 'z').min(-10).max(200).step(0.1)
 .onChange(() => {
+
     myViewer.render()
     console.log(myViewer.camera.position)
+    
+})
+
+// debug camera target
+const targetFolder = gui.addFolder('Camera Target')
+
+targetFolder.add(myViewer.controls.target, 'x').min(-10).max(10).step(0.1)
+.onChange(() => {
+
+    myViewer.controls.update()
+    myViewer.render()
+    console.log('target', myViewer.controls.target)
+
+})
+
+targetFolder.add(myViewer.controls.target, 'y').min(-10).max(10).step(0.1)
+.onChange(() => {
+
+    myViewer.controls.update()
+    myViewer.render()
+    console.log('target', myViewer.controls.target)
+
+})
+
+targetFolder.add(myViewer.controls.target, 'z').min(-10).max(10).step(0.1)
+.onChange(() => {
+
+    myViewer.controls.update()
+    myViewer.render()
+    console.log('target', myViewer.controls.target)
+
 })
