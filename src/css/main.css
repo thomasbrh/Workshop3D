@@ -1,0 +1,18 @@
+.canvas__wrapper {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.canvas {
+    width: 100% !important;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+}
