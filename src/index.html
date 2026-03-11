@@ -10,11 +10,36 @@
     </head>
     <body class="page">
         <div class="page__wrapper">
+
             <main class="page__content">
-                <div class="canvas__wrapper | js-canvas-wrapper">
-                    <canvas class="canvas | js-canvas-3d"></canvas>
+
+                <!-- loading in progress -->
+                <div class="loader loader-manager">
+
+                    <video class="loader__video" autoplay muted loop playsinline>
+                        
+                        <source src="/loading.mp4" type="video/mp4">
+
+                    </video>
                 </div>
+
+
+                <button class="btn-decouvrir hidden">Découvrir</button>
+                <div class="blur-overlay hidden"></div>
+
+
+                <p class="instructions">Appuyer sur E pour continuer</p>
+            
+
+                <!-- canvas threre.js  -->
+                <div class="canvas__wrapper | js-canvas-wrapper">
+
+                    <canvas class="canvas | js-canvas-3d"></canvas>
+
+                </div>
+
             </main>
+
         </div>
     </body>
 </html>

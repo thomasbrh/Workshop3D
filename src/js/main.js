@@ -6,6 +6,69 @@ import gsap from "gsap";
 import { Pane } from 'tweakpane';
 import GUI from 'lil-gui'
 
+
+
+/**
+ * Loader setup
+ */
+
+// Draco loader
+const dracoLoader = new DRACOLoader()
+dracoLoader.setDecoderPath('/draco/')
+
+// loadingManager
+const loadingManager = new THREE.LoadingManager()
+
+// Gltf loader
+const gltfLoader = new GLTFLoader(loadingManager)
+gltfLoader.setDRACOLoader(dracoLoader)
+
+// Texture loader
+const textureLoader = new THREE.TextureLoader(loadingManager)
+
+
+
+/**
+ * Loading progress onLoad()
+ */
+// const onLoad()
+const loaderManager = document.querySelector(".loader-manager")
+const btnDecouvrir = document.querySelector(".btn-decouvrir")
+const blurOverlay = document.querySelector(".blur-overlay")
+let experienceStarted = false
+
+
+// une fois chargé on enlève
+loadingManager.onLoad = () => 
+{
+    loaderManager.classList.add("hidden")
+    
+    blurOverlay.classList.remove("hidden")
+    btnDecouvrir.classList.remove("hidden")
+    
+}
+
+
+/**
+ * Start 
+ */
+btnDecouvrir.addEventListener("click", () => {
+
+    // protection db click
+    btnDecouvrir.disabled = true
+
+    // expérience commence
+    experienceStarted = true
+    blurOverlay.classList.add("hidden")
+    btnDecouvrir.classList.add("hidden")
+
+    // joue la première animation
+    myViewer.playVolets()
+
+})
+
+
+
 /** 
  * SETTINGS
  */
@@ -25,24 +88,6 @@ const threejsOptions = {
 };
 
 
-/**
- * Loader
- */
-
-// Draco loader
-const dracoLoader = new DRACOLoader()
-dracoLoader.setDecoderPath('/draco/')
-
-
-// Gltf loader
-const gltfLoader = new GLTFLoader()
-gltfLoader.setDRACOLoader(dracoLoader)
-
-
-// Texture loader + loadingManager
-const loadingManager = new THREE.LoadingManager()
-const textureLoader = new THREE.TextureLoader(loadingManager)
-
 
 /**
  * Texturing
@@ -51,12 +96,8 @@ const bakedTexture = textureLoader.load('/baked.webp')
 bakedTexture.flipY = false
 bakedTexture.colorSpace = THREE.SRGBColorSpace
 
-console.log(bakedTexture)
-
-
 // Create material for gltf
-const bakedMaterial = new THREE.MeshStandardMaterial({ map: bakedTexture })
-
+const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 
 
 
@@ -72,6 +113,11 @@ class Viewer {
 
         this.setRenderer(options);
 
+        // initialisations
+        this.mainGltf = null
+        this.mixer = null
+        this.clips = []
+
     }
 
 
@@ -81,12 +127,30 @@ class Viewer {
      */
     async loadModel() {
 
+        // Charger la scène
         const mainGltf = await gltfLoader.loadAsync('/gltf-main-merge.glb')
 
+        // prépare les clips
+        this.mainGltf = mainGltf
+        this.mixer = new THREE.AnimationMixer(mainGltf.scene)
+        this.clips = mainGltf.animations
+
+        // Add la scène
         this.scene.add(mainGltf.scene)
-        console.log(mainGltf)
 
         this.render()
+
+    }
+
+
+
+    playVolets() {
+    
+        /* const clip = this.clips[0]
+        const action = this.mixer.clipAction(clip)
+
+        action.reset()
+        action.play() */
 
     }
 
@@ -120,7 +184,7 @@ class Viewer {
                 position: new THREE.Vector3(0, 0.75, 5),
                 target: new THREE.Vector3(0, -0.75, 0)
             },
-            
+
             {
                 // scène 1
                 position: new THREE.Vector3(-0.8, 1.6, 0.6),
@@ -145,7 +209,7 @@ class Viewer {
                 // scène 4
                 position: new THREE.Vector3(0.4, -0.8, 0.8),
                 target: new THREE.Vector3(-0.2, -1.5, -1)
-            }
+            },
         ];
 
         this.updateCameraPosition();
@@ -162,9 +226,12 @@ class Viewer {
 
         // Tout les éléments à ajouter dans la scene
         // lumière ambiante
-        const sunLight = new THREE.AmbientLight('white', 0.75)
+        const sunLight = new THREE.AmbientLight('white', 0.5)
+        // lumière directionnel
+        const directionalLight = new THREE.DirectionalLight('white', 3);
+        directionalLight.position.set(0, 20, 20)
 
-        this.scene.add( sunLight );
+        this.scene.add( sunLight, directionalLight );
 
         // Demander un rendu
         this.render();
@@ -213,7 +280,7 @@ class Viewer {
         this.camera = new THREE.PerspectiveCamera(
             75, 
             settings.sizes.w / settings.sizes.h, // On le calcule avec la taille du wrapper
-            0.01, // valeur min pour ne pas traverser les objets
+            0.001, // valeur min pour ne pas traverser les objets
             275
         );
 
@@ -287,39 +354,36 @@ window.addEventListener("resize", () => {
 });
 
 
+
 /** 
  * Event tracking camera
  */
-window.addEventListener("keydown", () => {
+window.addEventListener("keydown", (event) => {
 
-    if (event.key !== "e") return;
+    if (!experienceStarted) return
+    if (event.key !== "e") return
 
-    const length = myViewer.camerasData.length;
-    myViewer.indexCamera = (myViewer.indexCamera + 1) % length;
+    const length = myViewer.camerasData.length
+    myViewer.indexCamera = (myViewer.indexCamera + 1) % length
 
-    const data = myViewer.camerasData[myViewer.indexCamera];
+    const data = myViewer.camerasData[myViewer.indexCamera]
 
-    if (!data) return;
+    if (!data) return
 
     gsap.to(myViewer.camera.position, {
-
         duration: 1,
-
         x: data.position.x,
         y: data.position.y,
         z: data.position.z,
 
         onUpdate: () => {
-
-            myViewer.controls.target.copy(data.target);
-            myViewer.controls.update();
-            myViewer.render();
-
+            myViewer.controls.target.copy(data.target)
+            myViewer.controls.update()
+            myViewer.render()
         }
+    })
 
-    });
-
-});
+})
 
 
 
@@ -347,7 +411,6 @@ cameraFolder.add(debugObject.camera.position, 'x').min(-10).max(200).step(0.1)
 .onChange(() => {
 
     myViewer.render()
-    console.log(myViewer.camera.position)
 
 })
 
@@ -355,7 +418,6 @@ cameraFolder.add(debugObject.camera.position, 'y').min(-10).max(200).step(0.1)
 .onChange(() => {
 
     myViewer.render()
-    console.log(myViewer.camera.position)
 
 })
 
@@ -363,7 +425,6 @@ cameraFolder.add(debugObject.camera.position, 'z').min(-10).max(200).step(0.1)
 .onChange(() => {
 
     myViewer.render()
-    console.log(myViewer.camera.position)
     
 })
 
@@ -375,7 +436,6 @@ targetFolder.add(myViewer.controls.target, 'x').min(-10).max(10).step(0.1)
 
     myViewer.controls.update()
     myViewer.render()
-    console.log('target', myViewer.controls.target)
 
 })
 
@@ -384,7 +444,6 @@ targetFolder.add(myViewer.controls.target, 'y').min(-10).max(10).step(0.1)
 
     myViewer.controls.update()
     myViewer.render()
-    console.log('target', myViewer.controls.target)
 
 })
 
@@ -393,6 +452,5 @@ targetFolder.add(myViewer.controls.target, 'z').min(-10).max(10).step(0.1)
 
     myViewer.controls.update()
     myViewer.render()
-    console.log('target', myViewer.controls.target)
 
 })
