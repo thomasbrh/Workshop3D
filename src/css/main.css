@@ -90,8 +90,8 @@
 
 
 
-/* btn-decouvrir */
-.btn-decouvrir 
+/* start-btn */
+.start-btn 
 {
     z-index: 1000;
     position: fixed;
@@ -107,13 +107,13 @@
     background-color:burlywood;
     border-radius: 3rem;
 }
-.btn-decouvrir:hover 
+.start-btn:hover 
 {
     transform: scale(1.1);
     background-color:saddlebrown;
 }
 
-.btn-decouvrir.hidden 
+.start-btn.hidden 
 {
     display: none;
     pointer-events: none;

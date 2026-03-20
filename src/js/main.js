@@ -47,7 +47,7 @@ class SceneLoader
         // DOM
         this.loadingBarElement = document.querySelector('.loading-bar')
         this.loadingBarBgElement = document.querySelector('.loading-bar-bg')
-        this.btnDecouvrir = document.querySelector('.btn-decouvrir')
+        this.startBtn = document.querySelector('.start-btn')
         this.blurOverlay = document.querySelector('.blur-overlay')
 
         // overlay three
@@ -97,7 +97,7 @@ class SceneLoader
 
                 })
 
-            }, 1000)
+            }, 2000)
 
         }
 
@@ -163,7 +163,7 @@ class SceneLoader
     {
 
         this.blurOverlay.classList.remove('hidden')
-        this.btnDecouvrir.classList.remove('hidden')
+        this.startBtn.classList.remove('hidden')
 
     }
 
@@ -171,8 +171,8 @@ class SceneLoader
     {
 
         this.blurOverlay.classList.add('hidden')
-        this.btnDecouvrir.classList.add('hidden')
-        this.btnDecouvrir.disabled = true
+        this.startBtn.classList.add('hidden')
+        this.startBtn.disabled = true
 
     }
 
@@ -215,17 +215,19 @@ class Viewer
 
         this.setRenderer(options);
         this.startButton()
+        this.EventCamera()
 
     }
 
 
+    /*  */
     startButton()
     {
 
-        this.loader.btnDecouvrir.addEventListener('click', () =>
+        this.loader.startBtn.addEventListener('click', () =>
         {
 
-            this.loader.btnDecouvrir.disabled = true
+            this.loader.startBtn.disabled = true
 
             this.experienceStarted = true
 
@@ -240,7 +242,7 @@ class Viewer
 
 
     /**
-     * loading texture
+     * Loading texture
      */
     loadTexture()
     {
@@ -259,7 +261,7 @@ class Viewer
 
 
     /**
-     * loading model gltf
+     * Loading model gltf
      */
     async loadModel() 
     {
@@ -283,7 +285,9 @@ class Viewer
     }
 
 
-
+    /**
+     * Animations
+     */
     playVolets() 
     {
     
@@ -370,6 +374,58 @@ class Viewer
     }
 
 
+    /**
+     * Event tracking camera
+     */
+    EventCamera()
+    {
+
+        window.addEventListener("keydown", (event) => 
+        {
+
+            if (!this.experienceStarted) return
+            if (event.key.toLowerCase() !== "e") return
+            if (this.isCameraMoving) return
+
+            this.data = this.camerasData
+            [
+                (this.indexCamera + 1) % this.camerasData.length
+
+            ]
+            if (!this.data) return
+
+            this.isCameraMoving = true
+            this.indexCamera = (this.indexCamera + 1) % this.camerasData.length
+
+            gsap.to(this.camera.position, 
+            {
+
+                duration: 1,
+                x: this.data.position.x,
+                y: this.data.position.y,
+                z: this.data.position.z,
+
+                onUpdate: () => 
+                {
+
+                    this.controls.target.copy(this.data.target)
+                    this.controls.update()
+                    this.render()
+
+                },
+
+                onComplete: () =>
+                {
+                    this.isCameraMoving = false
+                }
+
+            })
+
+        })
+
+    }
+    
+
 
     /** 
      * populate
@@ -389,30 +445,6 @@ class Viewer
         this.scene.add( this.sunLight, this.directionalLight );
 
         // Demander un rendu
-        this.render();
-
-    }
-
-
-
-    /** 
-     * Gizmo
-     */
-    removeGizmo() 
-    {
-
-        this.scene.remove(this.gizmo);
-        this.gizmo.dispose();
-        this.gizmo = null;
-        this.render();
-
-    }
-
-    addGizmo(size = 1) 
-    {
-
-        this.gizmo = new THREE.AxesHelper(size);
-        this.scene.add(this.gizmo);
         this.render();
 
     }
@@ -449,6 +481,7 @@ class Viewer
         {
             this.render();
         });
+        this.controls.enabled = false
 
         // Recule notre camera pour qu'on puisse voir le centre de la scene
         this.camera.position.set( 0, 1.2, 1.8) // x, y, z
@@ -529,6 +562,31 @@ class Viewer
 
     }
 
+    /** 
+     * Gizmo
+     */
+    removeGizmo() 
+    {
+
+        if(!this.gizmo) return
+
+        this.scene.remove(this.gizmo);
+        this.gizmo.dispose();
+        this.gizmo = null;
+        this.render();
+
+    }
+
+    addGizmo(size = 1) 
+    {
+        if(this.gizmo) return
+
+        this.gizmo = new THREE.AxesHelper(size);
+        this.scene.add(this.gizmo);
+        this.render();
+
+    }
+
 }
 
 
@@ -536,7 +594,6 @@ class Viewer
  * myViewer
  */
 const myViewer = new Viewer(threejsOptions);
-myViewer.addGizmo(2); // envie de tweak ça
 
 // Ajouter un event resize et appeler la fonction qui gère les changements de tailles
 window.addEventListener("resize", () => 
@@ -547,134 +604,164 @@ window.addEventListener("resize", () =>
 });
 
 
-
-/** 
- * Event tracking camera
+/**
+ * DEBUG CLASS
  */
-// !!!!!!!!!! add un cooldown pour l'animation
-window.addEventListener("keydown", (event) => 
+class Debug
 {
 
-    if (!myViewer.experienceStarted) return
-    if (event.key !== "e") return
+    constructor()
+    {
 
-    const length = myViewer.camerasData.length
-    myViewer.indexCamera = (myViewer.indexCamera + 1) % length
+        // demande #debug dans le chemin
+        this.debugActive = window.location.hash.includes('debug')
 
-    const data = myViewer.camerasData[myViewer.indexCamera]
-
-    if (!data) return
-
-    gsap.to(myViewer.camera.position, {
-
-        duration: 1,
-        x: data.position.x,
-        y: data.position.y,
-        z: data.position.z,
-
-        onUpdate: () => 
+        // si debug actif
+        if(this.debugActive)
         {
 
-            myViewer.controls.target.copy(data.target)
-            myViewer.controls.update()
-            myViewer.render()
+            // objet a debug
+            this.debugObject = 
+            {
+                orbitControls: true,
+                gizmo: false,
+                camera: myViewer.camera,
+            }
+
+
+            // lil-gui
+            this.gui = new GUI(
+            { 
+                name: 'debug',
+                width: 400
+            })
+
+
+            // spector.js
+            this.spector = new Spector()
+            this.spector.displayUI()
+
+
+            // debugFolder
+            this.cameraDebug()
+            this.guizmoDebug()
+            this.orbitControlsDebug()
 
         }
 
-    })
-
-})
-
-
-
-/** 
- * Debug
- */
-/* const pane = new Pane(); */
-
-// remettre en tweakpane 
-
-const debugActive = window.location.hash.includes('debug')
-
-if(debugActive)
-{
-
-    const debugObject = 
-    {
-        
-        camera: myViewer.camera
-        
     }
 
-    // lil-gui
-    const gui = new GUI(
-    { 
-
-        name: 'debug',
-        width: 400
-
-    })
-
-    // spector.js
-    const spector = new Spector()
-    spector.displayUI()
-
-
-    // debug camera
-    const cameraFolder = gui.addFolder('Camera')
-
-    cameraFolder.add(debugObject.camera.position, 'x').min(-10).max(200).step(0.1)
-    .onChange(() => 
+    /**
+     * OrbitControls
+     */
+    orbitControlsDebug()
     {
 
-        myViewer.render()
+        this.gui
+            .add(this.debugObject, 'orbitControls')
+            .name('Orbit controls')
+            .onChange((value) =>
+            {
 
-    })
+                myViewer.controls.enabled = value
+                myViewer.render()
 
-    cameraFolder.add(debugObject.camera.position, 'y').min(-10).max(200).step(0.1)
-    .onChange(() => 
+            })
+
+    }
+
+
+    /**
+     * debug guizmo 
+     * */
+    guizmoDebug()
     {
 
-        myViewer.render()
+        this.gui
+        .add(this.debugObject, 'gizmo')
+        .name('Afficher gizmo')
+        .onChange((value) =>
+        {
 
-    })
+            if(value)
+            {
+                myViewer.addGizmo(2)
+            }
+            else
+            {
+                myViewer.removeGizmo()
+            }
 
-    cameraFolder.add(debugObject.camera.position, 'z').min(-10).max(200).step(0.1)
-    .onChange(() => 
+        })
+
+    }
+
+
+    /**
+     * debug camera
+     */
+    cameraDebug()
     {
 
-        myViewer.render()
-        
-    })
+        // debug camera
+        this.cameraFolder = this.gui.addFolder('Camera')
 
-    // debug camera target
-    const targetFolder = gui.addFolder('Camera Target')
+        this.cameraFolder.add(this.debugObject.camera.position, 'x').min(-10).max(200).step(0.1)
+        .onChange(() => 
+        {
 
-    targetFolder.add(myViewer.controls.target, 'x').min(-10).max(10).step(0.1)
-    .onChange(() => 
-    {
+            myViewer.render()
 
-        myViewer.controls.update()
-        myViewer.render()
+        })
 
-    })
+        this.cameraFolder.add(this.debugObject.camera.position, 'y').min(-10).max(200).step(0.1)
+        .onChange(() => 
+        {
 
-    targetFolder.add(myViewer.controls.target, 'y').min(-10).max(10).step(0.1)
-    .onChange(() => 
-    {
+            myViewer.render()
 
-        myViewer.controls.update()
-        myViewer.render()
+        })
 
-    })
+        this.cameraFolder.add(this.debugObject.camera.position, 'z').min(-10).max(200).step(0.1)
+        .onChange(() => 
+        {
 
-    targetFolder.add(myViewer.controls.target, 'z').min(-10).max(10).step(0.1)
-    .onChange(() => 
-    {
+            myViewer.render()
+            
+        })
 
-        myViewer.controls.update()
-        myViewer.render()
+        // debug camera target
+        this.targetFolder = this.gui.addFolder('Camera Target')
 
-    })
+        this.targetFolder.add(myViewer.controls.target, 'x').min(-10).max(10).step(0.1)
+        .onChange(() => 
+        {
+
+            myViewer.controls.update()
+            myViewer.render()
+
+        })
+
+        this.targetFolder.add(myViewer.controls.target, 'y').min(-10).max(10).step(0.1)
+        .onChange(() => 
+        {
+
+            myViewer.controls.update()
+            myViewer.render()
+
+        })
+
+        this.targetFolder.add(myViewer.controls.target, 'z').min(-10).max(10).step(0.1)
+        .onChange(() => 
+        {
+
+            myViewer.controls.update()
+            myViewer.render()
+
+        })
+
+    }
 
 }
+
+const debug = new Debug()
