@@ -1,3 +1,6 @@
+/**
+ * IMPORT
+ */
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -6,69 +9,6 @@ import gsap from "gsap";
 /* import { Pane } from 'tweakpane'; */
 import GUI from 'lil-gui'
 import { Spector } from 'spectorjs'
-
-
-
-/**
- * Loader setup
- */
-
-// Draco loader
-const dracoLoader = new DRACOLoader()
-dracoLoader.setDecoderPath('/draco/')
-
-// loadingManager
-const loadingManager = new THREE.LoadingManager()
-
-// Gltf loader
-const gltfLoader = new GLTFLoader(loadingManager)
-gltfLoader.setDRACOLoader(dracoLoader)
-
-// Texture loader
-const textureLoader = new THREE.TextureLoader(loadingManager)
-
-
-
-/**
- * Loading progress onLoad()
- */
-// const onLoad()
-const loaderManager = document.querySelector(".loader-manager")
-const btnDecouvrir = document.querySelector(".btn-decouvrir")
-const blurOverlay = document.querySelector(".blur-overlay")
-let experienceStarted = false
-
-
-// une fois chargé on enlève
-loadingManager.onLoad = () => 
-{
-
-    loaderManager.classList.add("hidden")
-    
-    blurOverlay.classList.remove("hidden")
-    btnDecouvrir.classList.remove("hidden")
-    
-}
-
-
-/**
- * Start 
- */
-btnDecouvrir.addEventListener("click", () => 
-{
-
-    // protection db click
-    btnDecouvrir.disabled = true
-
-    // expérience commence
-    experienceStarted = true
-    blurOverlay.classList.add("hidden")
-    btnDecouvrir.classList.add("hidden")
-
-    // joue la première animation
-    myViewer.playVolets()
-
-})
 
 
 
@@ -93,32 +33,180 @@ const threejsOptions =
 
 
 /**
- * Texturing
+ * SCENELOADER CLASS
  */
-const bakedTexture = textureLoader.load('baked_test.webp')
-bakedTexture.flipY = false
-bakedTexture.colorSpace = THREE.SRGBColorSpace
+class SceneLoader
+{
 
-// Create material for gltf
-const bakedMaterial = new THREE.MeshBasicMaterial(
-{ 
-    map: bakedTexture 
-})
+    constructor(scene)
+    {
+
+        this.scene = scene
+        this.progress = 0
+
+        // DOM
+        this.loadingBarElement = document.querySelector('.loading-bar')
+        this.loadingBarBgElement = document.querySelector('.loading-bar-bg')
+        this.btnDecouvrir = document.querySelector('.btn-decouvrir')
+        this.blurOverlay = document.querySelector('.blur-overlay')
+
+        // overlay three
+        this.setOverlay()
+
+        // draco
+        this.dracoLoader = new DRACOLoader()
+        this.dracoLoader.setDecoderPath('/draco/gltf/')
+
+        // loading manager
+        this.loadingManager = new THREE.LoadingManager()
+
+        this.loadingManager.onProgress = (itemUrl, itemsLoaded, itemsTotal) =>
+        {
+
+            this.rawProgress = itemsLoaded / itemsTotal
+            this.cappedProgress = Math.min(this.rawProgress, 0.95)
+
+            this.progress = Math.max(this.progress, this.cappedProgress)
+
+            this.loadingBarElement.style.transform = `scaleX(${this.progress})`
+
+        }
+
+        this.loadingManager.onLoad = () =>
+        {
+
+            window.setTimeout(() =>
+            {
+
+                // force le 100%
+                this.progress = 1
+                this.loadingBarElement.style.transform = 'scaleX(1)'
+
+                this.showStartUI()
+
+                gsap.to(this.overlayMaterial.uniforms.uAlpha, 
+                {
+
+                    duration: 0,
+                    value: 0,
+                    onComplete: () =>
+                    {
+                        this.loadingBarElement.classList.add('ended')
+                        this.loadingBarBgElement.classList.add('ended')
+                    }
+
+                })
+
+            }, 1000)
+
+        }
+
+        // loaders
+        this.gltfLoader = new GLTFLoader(this.loadingManager)
+        this.gltfLoader.setDRACOLoader(this.dracoLoader)
+
+        this.textureLoader = new THREE.TextureLoader(this.loadingManager)
+
+    }
+
+    setOverlay()
+    {
+
+        this.overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1)
+
+        this.overlayMaterial = new THREE.ShaderMaterial(
+        {
+
+            transparent: true,
+            uniforms:
+            {
+                uAlpha: { value: 1 }
+            },
+            vertexShader: 
+            `
+                void main()
+                {
+                    gl_Position = vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: 
+            `
+                uniform float uAlpha;
+
+                void main()
+                {
+                    gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+                }
+            `
+
+        })
+
+        this.overlayMesh = new THREE.Mesh(this.overlayGeometry, this.overlayMaterial)
+        this.scene.add(this.overlayMesh)
+
+    }
+
+    hideOverlay()
+    {
+
+        gsap.to(this.overlayMaterial.uniforms.uAlpha, 
+        {
+
+            duration: 0.25,
+            value: 0
+
+        })
+
+    }
+
+    showStartUI()
+    {
+
+        this.blurOverlay.classList.remove('hidden')
+        this.btnDecouvrir.classList.remove('hidden')
+
+    }
+
+    hideStartUI()
+    {
+
+        this.blurOverlay.classList.add('hidden')
+        this.btnDecouvrir.classList.add('hidden')
+        this.btnDecouvrir.disabled = true
+
+    }
+
+    loadTexture(path)
+    {
+        return this.textureLoader.load(path)
+    }
+
+    async loadGLTF(path)
+    {
+        return await this.gltfLoader.loadAsync(path)
+    }
+
+}
 
 
 
 /** 
  * VIEWER CLASS
  */
+class Viewer 
+{
 
-// viewer class
-class Viewer {
     constructor(options) 
     {
 
+        // canvas
         this.canvas = options.canvas;
 
+        // time
         this.clock = new THREE.Clock()
+
+        // experience
+        this.experienceStarted = false
 
         // initialisations
         this.mainGltf = null
@@ -126,6 +214,45 @@ class Viewer {
         this.clips = []
 
         this.setRenderer(options);
+        this.startButton()
+
+    }
+
+
+    startButton()
+    {
+
+        this.loader.btnDecouvrir.addEventListener('click', () =>
+        {
+
+            this.loader.btnDecouvrir.disabled = true
+
+            this.experienceStarted = true
+
+            this.loader.hideStartUI()
+
+            this.playVolets()
+
+        })
+
+    }
+
+
+
+    /**
+     * loading texture
+     */
+    loadTexture()
+    {
+
+        this.bakedTexture = this.loader.loadTexture('textures/baked_test.webp')
+        this.bakedTexture.flipY = false
+        this.bakedTexture.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedMaterial = new THREE.MeshBasicMaterial(
+        {
+            map: this.bakedTexture
+        })
 
     }
 
@@ -138,16 +265,16 @@ class Viewer {
     {
 
         // Charger la scène
-        this.mainGltf = await gltfLoader.loadAsync('/gltf-main-texture.glb')
+        this.mainGltf = await this.loader.loadGLTF('glb/gltf-main-texture.glb')
 
         // Charger l'animation'
-        this.animPorte = await gltfLoader.loadAsync('/anim-porte.glb')
+        this.animPorte = await this.loader.loadGLTF('glb/animations/anim-porte.glb')
 
         // Add la scène
         this.scene.add(this.mainGltf.scene, this.animPorte.scene)
 
         // prépare les clips
-        this.animPorte = this.animPorte
+        // this.animPorte = this.animPorte remove
         this.mixer = new THREE.AnimationMixer(this.animPorte.scene)
         this.clips = this.animPorte.animations
 
@@ -331,13 +458,19 @@ class Viewer {
         this.scene = new THREE.Scene();
         this.scene.add(this.camera);
 
+        // Loader overlay
+        this.loader = new SceneLoader(this.scene)
+
         // Change une première fois la taille de notre canvas
         this.resize();
 
 
         // Appele les fonctions d'ajout d'éléments
+        this.loadTexture()
         this.loadModel();
+
         this.travelling();
+
         this.populate();
 
         this.tick()
@@ -403,7 +536,7 @@ class Viewer {
  * myViewer
  */
 const myViewer = new Viewer(threejsOptions);
-myViewer.addGizmo(2);
+myViewer.addGizmo(2); // envie de tweak ça
 
 // Ajouter un event resize et appeler la fonction qui gère les changements de tailles
 window.addEventListener("resize", () => 
@@ -422,7 +555,7 @@ window.addEventListener("resize", () =>
 window.addEventListener("keydown", (event) => 
 {
 
-    if (!experienceStarted) return
+    if (!myViewer.experienceStarted) return
     if (event.key !== "e") return
 
     const length = myViewer.camerasData.length
