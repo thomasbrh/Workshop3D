@@ -3,8 +3,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import gsap from "gsap";
-import { Pane } from 'tweakpane';
+/* import { Pane } from 'tweakpane'; */
 import GUI from 'lil-gui'
+import { Spector } from 'spectorjs'
 
 
 
@@ -41,6 +42,7 @@ let experienceStarted = false
 // une fois chargé on enlève
 loadingManager.onLoad = () => 
 {
+
     loaderManager.classList.add("hidden")
     
     blurOverlay.classList.remove("hidden")
@@ -52,7 +54,8 @@ loadingManager.onLoad = () =>
 /**
  * Start 
  */
-btnDecouvrir.addEventListener("click", () => {
+btnDecouvrir.addEventListener("click", () => 
+{
 
     // protection db click
     btnDecouvrir.disabled = true
@@ -72,7 +75,8 @@ btnDecouvrir.addEventListener("click", () => {
 /** 
  * SETTINGS
  */
-const settings = {
+const settings = 
+{
 
     wrapper: document.querySelector(".js-canvas-wrapper"),
     canvas: document.querySelector(".js-canvas-3d"),
@@ -81,10 +85,9 @@ const settings = {
 
 };
 
-const threejsOptions = {
-
+const threejsOptions = 
+{
     canvas: settings.canvas,
-
 };
 
 
@@ -92,12 +95,15 @@ const threejsOptions = {
 /**
  * Texturing
  */
-const bakedTexture = textureLoader.load('/baked.webp')
+const bakedTexture = textureLoader.load('baked_test.webp')
 bakedTexture.flipY = false
 bakedTexture.colorSpace = THREE.SRGBColorSpace
 
 // Create material for gltf
-const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
+const bakedMaterial = new THREE.MeshBasicMaterial(
+{ 
+    map: bakedTexture 
+})
 
 
 
@@ -107,16 +113,19 @@ const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 
 // viewer class
 class Viewer {
-    constructor(options) {
+    constructor(options) 
+    {
 
         this.canvas = options.canvas;
 
-        this.setRenderer(options);
+        this.clock = new THREE.Clock()
 
         // initialisations
         this.mainGltf = null
         this.mixer = null
         this.clips = []
+
+        this.setRenderer(options);
 
     }
 
@@ -125,18 +134,22 @@ class Viewer {
     /**
      * loading model gltf
      */
-    async loadModel() {
+    async loadModel() 
+    {
 
         // Charger la scène
-        const mainGltf = await gltfLoader.loadAsync('/gltf-main-merge.glb')
+        this.mainGltf = await gltfLoader.loadAsync('/gltf-main-texture.glb')
 
-        // prépare les clips
-        this.mainGltf = mainGltf
-        this.mixer = new THREE.AnimationMixer(mainGltf.scene)
-        this.clips = mainGltf.animations
+        // Charger l'animation'
+        this.animPorte = await gltfLoader.loadAsync('/anim-porte.glb')
 
         // Add la scène
-        this.scene.add(mainGltf.scene)
+        this.scene.add(this.mainGltf.scene, this.animPorte.scene)
+
+        // prépare les clips
+        this.animPorte = this.animPorte
+        this.mixer = new THREE.AnimationMixer(this.animPorte.scene)
+        this.clips = this.animPorte.animations
 
         this.render()
 
@@ -144,13 +157,23 @@ class Viewer {
 
 
 
-    playVolets() {
+    playVolets() 
+    {
     
-        /* const clip = this.clips[0]
-        const action = this.mixer.clipAction(clip)
+        this.volet0 = this.clips[0]
+        this.volet1 = this.clips[1]
+        this.action1 = this.mixer.clipAction(this.volet0)
+        this.action2 = this.mixer.clipAction(this.volet1)
 
-        action.reset()
-        action.play() */
+        this.action1.reset()
+        this.action1.setLoop(THREE.LoopOnce, 1)
+        this.action1.clampWhenFinished = true
+        this.action1.play()
+
+        this.action2.reset()
+        this.action2.setLoop(THREE.LoopOnce, 1)
+        this.action2.clampWhenFinished = true
+        this.action2.play()
 
     }
 
@@ -159,22 +182,24 @@ class Viewer {
     /**
      * Tracking and travelling camera
      */   
-    updateCameraPosition() {
+    updateCameraPosition() 
+    {
 
-        const data = this.camerasData[this.indexCamera];
+        this.data = this.camerasData[this.indexCamera];
 
-        if (!data) return;
+        if (!this.data) return;
 
-        this.camera.position.copy(data.position);
+        this.camera.position.copy(this.data.position);
 
-        this.controls.target.copy(data.target);
+        this.controls.target.copy(this.data.target);
         this.controls.update();
 
     }
 
 
 
-    travelling() {
+    travelling() 
+    {
 
         this.indexCamera = 0;
 
@@ -222,16 +247,19 @@ class Viewer {
     /** 
      * populate
      */
-    populate() {
+    populate() 
+    {
 
         // Tout les éléments à ajouter dans la scene
         // lumière ambiante
-        const sunLight = new THREE.AmbientLight('white', 0.5)
-        // lumière directionnel
-        const directionalLight = new THREE.DirectionalLight('white', 3);
-        directionalLight.position.set(0, 20, 20)
+        this.sunLight = new THREE.AmbientLight('white', 0.5)
 
-        this.scene.add( sunLight, directionalLight );
+        // lumière directionnel
+        this.directionalLight = new THREE.DirectionalLight('white', 3);
+        this.directionalLight.position.set(0, 20, 20)
+
+        // add à la scene
+        this.scene.add( this.sunLight, this.directionalLight );
 
         // Demander un rendu
         this.render();
@@ -243,7 +271,8 @@ class Viewer {
     /** 
      * Gizmo
      */
-    removeGizmo() {
+    removeGizmo() 
+    {
 
         this.scene.remove(this.gizmo);
         this.gizmo.dispose();
@@ -252,7 +281,8 @@ class Viewer {
 
     }
 
-    addGizmo(size = 1) {
+    addGizmo(size = 1) 
+    {
 
         this.gizmo = new THREE.AxesHelper(size);
         this.scene.add(this.gizmo);
@@ -265,13 +295,15 @@ class Viewer {
     /**
      * Render
      */
-    render(scene = this.scene, camera = this.camera) {
+    render(scene = this.scene, camera = this.camera) 
+    {
 
         this.renderer.render(scene, camera);
 
     }
 
-    setRenderer(options = {}) {
+    setRenderer(options = {}) 
+    {
 
         this.renderer = new THREE.WebGLRenderer(options);
 
@@ -289,8 +321,7 @@ class Viewer {
         this.controls.addEventListener( 'change', () => 
         {
             this.render();
-        } 
-        );
+        });
 
         // Recule notre camera pour qu'on puisse voir le centre de la scene
         this.camera.position.set( 0, 1.2, 1.8) // x, y, z
@@ -309,13 +340,16 @@ class Viewer {
         this.travelling();
         this.populate();
 
+        this.tick()
+
     }
 
 
     /**
      * resize
      */
-    resize() {
+    resize() 
+    {
 
         // Mettre à jour nos settings
         settings.sizes.w = settings.wrapper.clientWidth;
@@ -337,6 +371,31 @@ class Viewer {
         this.render();
 
     }
+
+
+    /**
+     * AnimationFrame tick
+     */
+    tick() 
+    {
+
+        // initialisé l'horloge
+        this.delta = this.clock.getDelta()
+
+        if (this.mixer) 
+        {
+            this.mixer.update(this.delta)
+        }
+
+
+        // faire un rendu
+        this.render()
+
+        // prochaine frame
+        requestAnimationFrame(() => this.tick())
+
+    }
+
 }
 
 
@@ -347,7 +406,8 @@ const myViewer = new Viewer(threejsOptions);
 myViewer.addGizmo(2);
 
 // Ajouter un event resize et appeler la fonction qui gère les changements de tailles
-window.addEventListener("resize", () => {
+window.addEventListener("resize", () => 
+{
 
     myViewer.resize();
 
@@ -358,7 +418,9 @@ window.addEventListener("resize", () => {
 /** 
  * Event tracking camera
  */
-window.addEventListener("keydown", (event) => {
+// !!!!!!!!!! add un cooldown pour l'animation
+window.addEventListener("keydown", (event) => 
+{
 
     if (!experienceStarted) return
     if (event.key !== "e") return
@@ -371,16 +433,21 @@ window.addEventListener("keydown", (event) => {
     if (!data) return
 
     gsap.to(myViewer.camera.position, {
+
         duration: 1,
         x: data.position.x,
         y: data.position.y,
         z: data.position.z,
 
-        onUpdate: () => {
+        onUpdate: () => 
+        {
+
             myViewer.controls.target.copy(data.target)
             myViewer.controls.update()
             myViewer.render()
+
         }
+
     })
 
 })
@@ -390,67 +457,91 @@ window.addEventListener("keydown", (event) => {
 /** 
  * Debug
  */
-const pane = new Pane();
+/* const pane = new Pane(); */
 
 // remettre en tweakpane 
-const debugObject = {
 
-    camera: myViewer.camera
+const debugActive = window.location.hash.includes('debug')
+
+if(debugActive)
+{
+
+    const debugObject = 
+    {
+        
+        camera: myViewer.camera
+        
+    }
+
+    // lil-gui
+    const gui = new GUI(
+    { 
+
+        name: 'debug',
+        width: 400
+
+    })
+
+    // spector.js
+    const spector = new Spector()
+    spector.displayUI()
+
+
+    // debug camera
+    const cameraFolder = gui.addFolder('Camera')
+
+    cameraFolder.add(debugObject.camera.position, 'x').min(-10).max(200).step(0.1)
+    .onChange(() => 
+    {
+
+        myViewer.render()
+
+    })
+
+    cameraFolder.add(debugObject.camera.position, 'y').min(-10).max(200).step(0.1)
+    .onChange(() => 
+    {
+
+        myViewer.render()
+
+    })
+
+    cameraFolder.add(debugObject.camera.position, 'z').min(-10).max(200).step(0.1)
+    .onChange(() => 
+    {
+
+        myViewer.render()
+        
+    })
+
+    // debug camera target
+    const targetFolder = gui.addFolder('Camera Target')
+
+    targetFolder.add(myViewer.controls.target, 'x').min(-10).max(10).step(0.1)
+    .onChange(() => 
+    {
+
+        myViewer.controls.update()
+        myViewer.render()
+
+    })
+
+    targetFolder.add(myViewer.controls.target, 'y').min(-10).max(10).step(0.1)
+    .onChange(() => 
+    {
+
+        myViewer.controls.update()
+        myViewer.render()
+
+    })
+
+    targetFolder.add(myViewer.controls.target, 'z').min(-10).max(10).step(0.1)
+    .onChange(() => 
+    {
+
+        myViewer.controls.update()
+        myViewer.render()
+
+    })
 
 }
-
-const gui = new GUI({ 
-    name: 'debug',
-    width: 400
-})
-
-// debug camera
-const cameraFolder = gui.addFolder('Camera')
-
-cameraFolder.add(debugObject.camera.position, 'x').min(-10).max(200).step(0.1)
-.onChange(() => {
-
-    myViewer.render()
-
-})
-
-cameraFolder.add(debugObject.camera.position, 'y').min(-10).max(200).step(0.1)
-.onChange(() => {
-
-    myViewer.render()
-
-})
-
-cameraFolder.add(debugObject.camera.position, 'z').min(-10).max(200).step(0.1)
-.onChange(() => {
-
-    myViewer.render()
-    
-})
-
-// debug camera target
-const targetFolder = gui.addFolder('Camera Target')
-
-targetFolder.add(myViewer.controls.target, 'x').min(-10).max(10).step(0.1)
-.onChange(() => {
-
-    myViewer.controls.update()
-    myViewer.render()
-
-})
-
-targetFolder.add(myViewer.controls.target, 'y').min(-10).max(10).step(0.1)
-.onChange(() => {
-
-    myViewer.controls.update()
-    myViewer.render()
-
-})
-
-targetFolder.add(myViewer.controls.target, 'z').min(-10).max(10).step(0.1)
-.onChange(() => {
-
-    myViewer.controls.update()
-    myViewer.render()
-
-})
