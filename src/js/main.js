@@ -208,10 +208,12 @@ class Viewer
         // experience
         this.experienceStarted = false
 
-        // initialisations
-        this.mainGltf = null
-        this.mixer = null
-        this.clips = []
+        // audio
+        this.audioListener = null
+        this.audioLoader = null
+        this.clickBtnSound = null
+        this.ambienceSound = null
+        this.voletSound = null
 
         this.setRenderer(options);
         this.startButton()
@@ -229,9 +231,21 @@ class Viewer
 
             this.loader.startBtn.disabled = true
 
+            // son du bouton
+            if (this.clickBtnSound && this.clickBtnSound.buffer)
+            {
+                this.clickBtnSound.play()
+            }
+
             this.experienceStarted = true
 
             this.loader.hideStartUI()
+
+            // musique / ambiance
+            if (this.ambienceSound && this.ambienceSound.buffer && !this.ambienceSound.isPlaying)
+            {
+                this.ambienceSound.play()
+            }
 
             this.playVolets()
 
@@ -247,8 +261,8 @@ class Viewer
     loadTexture()
     {
 
-        this.bakedTexture = this.loader.loadTexture('textures/baked_test.webp')
-        this.bakedTexture.flipY = false
+        this.bakedTexture = this.loader.loadTexture('textures/baked.webp')
+        this.bakedTexture.flipY = true
         this.bakedTexture.colorSpace = THREE.SRGBColorSpace
 
         this.bakedMaterial = new THREE.MeshBasicMaterial(
@@ -267,7 +281,17 @@ class Viewer
     {
 
         // Charger la scène
-        this.mainGltf = await this.loader.loadGLTF('glb/gltf-main-texture.glb')
+        this.mainGltf = await this.loader.loadGLTF('glb/gltf-main-merge.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.mainGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                /* child.material = this.bakedMaterial */ // remove quand texture
+            }
+        })
+
 
         // Charger l'animation'
         this.animPorte = await this.loader.loadGLTF('glb/animations/anim-porte.glb')
@@ -286,10 +310,69 @@ class Viewer
 
 
     /**
+     * sound design
+     */
+    setAudio()
+    {
+
+        // "oreilles" de la caméra
+        this.audioListener = new THREE.AudioListener()
+        this.camera.add(this.audioListener)
+
+        // loader audio
+        this.audioLoader = new THREE.AudioLoader()
+
+        // son de clic
+        this.clickBtnSound = new THREE.Audio(this.audioListener)
+        this.audioLoader.load('son/btn/btn-wood1.wav', (buffer) =>
+        {
+
+            this.clickBtnSound.setBuffer(buffer)
+            this.clickBtnSound.setLoop(false)
+            this.clickBtnSound.setVolume(0.7)
+
+        })
+
+
+        // son des volets
+        this.voletSound = new THREE.Audio(this.audioListener)
+        this.audioLoader.load('son/animations/wood-volets.wav', (buffer) =>
+        {
+            this.voletSound.setBuffer(buffer)
+            this.voletSound.setLoop(false)
+            this.voletSound.setVolume(0.8)
+        })
+
+
+        // son d'ambiance / musique
+        this.ambienceSound = new THREE.Audio(this.audioListener)
+        this.audioLoader.load('son/ambience/ambience.wav', (buffer) =>
+        {
+
+            this.ambienceSound.setBuffer(buffer)
+            this.ambienceSound.setLoop(true)
+            this.ambienceSound.setVolume(0.4)
+
+        })
+
+    }
+
+
+    /**
      * Animations
      */
     playVolets() 
     {
+
+        setTimeout(() =>
+        {
+
+            if (this.voletSound && this.voletSound.buffer)
+            {
+                this.voletSound.play()
+            }
+
+        }, 0)
     
         this.volet0 = this.clips[0]
         this.volet1 = this.clips[1]
@@ -475,6 +558,9 @@ class Viewer
             275
         );
 
+        // ajout du son à la camera
+        this.setAudio()
+
         // OrbitControls
         this.controls = new OrbitControls( this.camera, this.renderer.domElement );
         this.controls.addEventListener( 'change', () => 
@@ -623,7 +709,7 @@ class Debug
             // objet a debug
             this.debugObject = 
             {
-                orbitControls: true,
+                orbitControls: false,
                 gizmo: false,
                 camera: myViewer.camera,
             }
