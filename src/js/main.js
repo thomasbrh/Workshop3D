@@ -25,6 +25,7 @@ const settings =
 
 };
 
+
 const threejsOptions = 
 {
     canvas: settings.canvas,
@@ -50,7 +51,7 @@ class SceneLoader
         this.startBtn = document.querySelector('.start-btn')
         this.blurOverlay = document.querySelector('.blur-overlay')
 
-        // overlay three
+        // l'overlay three.js
         this.setOverlay()
 
         // draco
@@ -63,11 +64,16 @@ class SceneLoader
         this.loadingManager.onProgress = (itemUrl, itemsLoaded, itemsTotal) =>
         {
 
-            this.rawProgress = itemsLoaded / itemsTotal
-            this.cappedProgress = Math.min(this.rawProgress, 0.95)
+            // calcul la réelle progression 
+            this.loadProgress = itemsLoaded / itemsTotal
 
-            this.progress = Math.max(this.progress, this.cappedProgress)
+            // calcul la progression affichée
+            this.displayProgress = Math.min(this.loadProgress, 0.95)
 
+            // garde la plus grande des deux
+            this.progress = Math.max(this.progress, this.displayProgress)
+
+            // incrémente la barre en fonction du progrès
             this.loadingBarElement.style.transform = `scaleX(${this.progress})`
 
         }
@@ -78,12 +84,14 @@ class SceneLoader
             window.setTimeout(() =>
             {
 
-                // force le 100%
+                // passer de 95 à 100 quand c'est loadé
                 this.progress = 1
                 this.loadingBarElement.style.transform = 'scaleX(1)'
 
+                // appelle le blur et btn
                 this.showStartUI()
 
+                // animation gsap qui va enlever la barre 
                 gsap.to(this.overlayMaterial.uniforms.uAlpha, 
                 {
 
@@ -101,14 +109,20 @@ class SceneLoader
 
         }
 
-        // loaders
+        // loader gltf
         this.gltfLoader = new GLTFLoader(this.loadingManager)
         this.gltfLoader.setDRACOLoader(this.dracoLoader)
 
+        // loader texture
         this.textureLoader = new THREE.TextureLoader(this.loadingManager)
+
+        // loader audio
+        this.audioLoader = new THREE.AudioLoader(this.loadingManager)
 
     }
 
+
+    // crée l'overlay
     setOverlay()
     {
 
@@ -141,24 +155,14 @@ class SceneLoader
 
         })
 
+        // crée le mesh de l'overlay
         this.overlayMesh = new THREE.Mesh(this.overlayGeometry, this.overlayMaterial)
         this.scene.add(this.overlayMesh)
 
     }
 
-    hideOverlay()
-    {
 
-        gsap.to(this.overlayMaterial.uniforms.uAlpha, 
-        {
-
-            duration: 0.25,
-            value: 0
-
-        })
-
-    }
-
+    // affiche le blur et startbtn
     showStartUI()
     {
 
@@ -167,6 +171,7 @@ class SceneLoader
 
     }
 
+    // cache le blur et startbtn
     hideStartUI()
     {
 
@@ -176,14 +181,25 @@ class SceneLoader
 
     }
 
+
+    // récupère les chemins pour alimenter this.loadingManager
     loadTexture(path)
     {
         return this.textureLoader.load(path)
     }
 
+
+    // récupère les chemins pour alimenter this.loadingManager
     async loadGLTF(path)
     {
         return await this.gltfLoader.loadAsync(path)
+    }
+
+
+    // récupère les chemins pour alimenter this.loadingManager
+    loadAudio(path)
+    {
+        return this.audioLoader.loadAsync(path)
     }
 
 }
@@ -211,57 +227,20 @@ class Viewer
         // audio
         this.audioListener = null
         this.audioLoader = null
-        this.clickBtnSound = null
         this.ambienceSound = null
-        this.voletSound = null
 
         this.setRenderer(options);
-        this.startButton()
-        this.EventCamera()
 
     }
-
-
-    /*  */
-    startButton()
-    {
-
-        this.loader.startBtn.addEventListener('click', () =>
-        {
-
-            this.loader.startBtn.disabled = true
-
-            // son du bouton
-            if (this.clickBtnSound && this.clickBtnSound.buffer)
-            {
-                this.clickBtnSound.play()
-            }
-
-            this.experienceStarted = true
-
-            this.loader.hideStartUI()
-
-            // musique / ambiance
-            if (this.ambienceSound && this.ambienceSound.buffer && !this.ambienceSound.isPlaying)
-            {
-                this.ambienceSound.play()
-            }
-
-            this.playVolets()
-
-        })
-
-    }
-
 
 
     /**
      * Loading texture
      */
-    loadTexture()
+    async loadTexture()
     {
 
-        this.bakedTexture = this.loader.loadTexture('textures/baked.webp')
+        this.bakedTexture = await this.loader.loadTexture('/textures/baked.webp')
         this.bakedTexture.flipY = true
         this.bakedTexture.colorSpace = THREE.SRGBColorSpace
 
@@ -273,7 +252,6 @@ class Viewer
     }
 
 
-
     /**
      * Loading model gltf
      */
@@ -281,7 +259,7 @@ class Viewer
     {
 
         // Charger la scène
-        this.mainGltf = await this.loader.loadGLTF('glb/gltf-main-merge.glb')
+        this.mainGltf = await this.loader.loadGLTF('/glb/gltf-test-texture.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
         this.mainGltf.scene.traverse((child) =>
@@ -294,13 +272,12 @@ class Viewer
 
 
         // Charger l'animation'
-        this.animPorte = await this.loader.loadGLTF('glb/animations/anim-porte.glb')
+        this.animPorte = await this.loader.loadGLTF('/glb/animations/anim-porte.glb')
 
         // Add la scène
         this.scene.add(this.mainGltf.scene, this.animPorte.scene)
 
         // prépare les clips
-        // this.animPorte = this.animPorte remove
         this.mixer = new THREE.AnimationMixer(this.animPorte.scene)
         this.clips = this.animPorte.animations
 
@@ -310,204 +287,29 @@ class Viewer
 
 
     /**
-     * sound design
+     * son
      */
     setAudio()
     {
-
-        // "oreilles" de la caméra
+        // ajoute du son à la camera
         this.audioListener = new THREE.AudioListener()
         this.camera.add(this.audioListener)
 
-        // loader audio
-        this.audioLoader = new THREE.AudioLoader()
+    }
 
-        // son de clic
-        this.clickBtnSound = new THREE.Audio(this.audioListener)
-        this.audioLoader.load('son/btn/btn-wood1.wav', (buffer) =>
-        {
+    // musique de fond
+    async loadGlobalAudio()
+    {
 
-            this.clickBtnSound.setBuffer(buffer)
-            this.clickBtnSound.setLoop(false)
-            this.clickBtnSound.setVolume(0.7)
-
-        })
-
-
-        // son des volets
-        this.voletSound = new THREE.Audio(this.audioListener)
-        this.audioLoader.load('son/animations/wood-volets.wav', (buffer) =>
-        {
-            this.voletSound.setBuffer(buffer)
-            this.voletSound.setLoop(false)
-            this.voletSound.setVolume(0.8)
-        })
-
-
-        // son d'ambiance / musique
         this.ambienceSound = new THREE.Audio(this.audioListener)
-        this.audioLoader.load('son/ambience/ambience.wav', (buffer) =>
-        {
 
-            this.ambienceSound.setBuffer(buffer)
-            this.ambienceSound.setLoop(true)
-            this.ambienceSound.setVolume(0.4)
+        const buffer = await this.loader.loadAudio('/son/ambience/ambience.wav')
 
-        })
+        this.ambienceSound.setBuffer(buffer)
+        this.ambienceSound.setLoop(true)
+        this.ambienceSound.setVolume(0.4)
 
     }
-
-
-    /**
-     * Animations
-     */
-    playVolets() 
-    {
-
-        setTimeout(() =>
-        {
-
-            if (this.voletSound && this.voletSound.buffer)
-            {
-                this.voletSound.play()
-            }
-
-        }, 0)
-    
-        this.volet0 = this.clips[0]
-        this.volet1 = this.clips[1]
-        this.action1 = this.mixer.clipAction(this.volet0)
-        this.action2 = this.mixer.clipAction(this.volet1)
-
-        this.action1.reset()
-        this.action1.setLoop(THREE.LoopOnce, 1)
-        this.action1.clampWhenFinished = true
-        this.action1.play()
-
-        this.action2.reset()
-        this.action2.setLoop(THREE.LoopOnce, 1)
-        this.action2.clampWhenFinished = true
-        this.action2.play()
-
-    }
-
-
-
-    /**
-     * Tracking and travelling camera
-     */   
-    updateCameraPosition() 
-    {
-
-        this.data = this.camerasData[this.indexCamera];
-
-        if (!this.data) return;
-
-        this.camera.position.copy(this.data.position);
-
-        this.controls.target.copy(this.data.target);
-        this.controls.update();
-
-    }
-
-
-
-    travelling() 
-    {
-
-        this.indexCamera = 0;
-
-        this.camerasData = [
-            {
-                // main camera
-                position: new THREE.Vector3(0, 0.75, 5),
-                target: new THREE.Vector3(0, -0.75, 0)
-            },
-
-            {
-                // scène 1
-                position: new THREE.Vector3(-0.8, 1.6, 0.6),
-                target: new THREE.Vector3(3.5, -0.5, -2.5)
-                // position: new THREE.Vector3(0.8, 1.6, 0.4),
-                // target: new THREE.Vector3(-3, -2, -2.5)
-            },
-            
-            {
-                // scène 2
-                position: new THREE.Vector3(-0.4, 0.8, 0.8),
-                target: new THREE.Vector3(-0.2, 0.1, -1)
-            },
-
-            {
-                // scène 3
-                position: new THREE.Vector3(0.4, -0.2, 0.8),
-                target: new THREE.Vector3(0.5, -0.2, -0.5)
-            },
-
-            {
-                // scène 4
-                position: new THREE.Vector3(0.4, -0.8, 0.8),
-                target: new THREE.Vector3(-0.2, -1.5, -1)
-            },
-        ];
-
-        this.updateCameraPosition();
-        this.render();
-
-    }
-
-
-    /**
-     * Event tracking camera
-     */
-    EventCamera()
-    {
-
-        window.addEventListener("keydown", (event) => 
-        {
-
-            if (!this.experienceStarted) return
-            if (event.key.toLowerCase() !== "e") return
-            if (this.isCameraMoving) return
-
-            this.data = this.camerasData
-            [
-                (this.indexCamera + 1) % this.camerasData.length
-
-            ]
-            if (!this.data) return
-
-            this.isCameraMoving = true
-            this.indexCamera = (this.indexCamera + 1) % this.camerasData.length
-
-            gsap.to(this.camera.position, 
-            {
-
-                duration: 1,
-                x: this.data.position.x,
-                y: this.data.position.y,
-                z: this.data.position.z,
-
-                onUpdate: () => 
-                {
-
-                    this.controls.target.copy(this.data.target)
-                    this.controls.update()
-                    this.render()
-
-                },
-
-                onComplete: () =>
-                {
-                    this.isCameraMoving = false
-                }
-
-            })
-
-        })
-
-    }
-    
 
 
     /** 
@@ -533,21 +335,20 @@ class Viewer
     }
 
 
-
     /**
      * Render
      */
     render(scene = this.scene, camera = this.camera) 
     {
-
         this.renderer.render(scene, camera);
-
     }
+
 
     setRenderer(options = {}) 
     {
 
         this.renderer = new THREE.WebGLRenderer(options);
+
 
         // Crée notre caméra
         // PerspectiveCamera( fov, aspect-ratio, near, far )
@@ -558,8 +359,17 @@ class Viewer
             275
         );
 
+
+        // Crée notre scene et y rajoute notre camera
+        this.scene = new THREE.Scene();
+        this.scene.add(this.camera);
+
+
+        // loaderManager
+        this.loader = new SceneLoader(this.scene)
         // ajout du son à la camera
         this.setAudio()
+
 
         // OrbitControls
         this.controls = new OrbitControls( this.camera, this.renderer.domElement );
@@ -569,30 +379,85 @@ class Viewer
         });
         this.controls.enabled = false
 
+
         // Recule notre camera pour qu'on puisse voir le centre de la scene
-        this.camera.position.set( 0, 1.2, 1.8) // x, y, z
+        this.camera.position.set( 0, 0.5, 7.5) // x, y, z
+        this.camera.lookAt(0, -1, -1.5)
 
 
-        // Crée notre scene et y rajoute notre camera
-        this.scene = new THREE.Scene();
-        this.scene.add(this.camera);
-
-        // Loader overlay
-        this.loader = new SceneLoader(this.scene)
 
         // Change une première fois la taille de notre canvas
         this.resize();
 
 
-        // Appele les fonctions d'ajout d'éléments
+        // Appele les fonctions de chargement des éléments
         this.loadTexture()
         this.loadModel();
+        this.loadGlobalAudio()
 
-        this.travelling();
 
         this.populate();
 
         this.tick()
+
+    }
+
+
+    /**
+     * Cameras
+     */
+    setCamera(position, target)
+    {
+
+        this.camera.position.copy(position)
+        this.controls.target.copy(target)
+        this.controls.update()
+        this.render()
+
+    }
+
+    // déplacer les cameras
+    moveCamera(position, target, duration = 1, onComplete = null)
+    {
+
+        // changer la position
+        gsap.to(this.camera.position, 
+        {
+
+            x: position.x,
+            y: position.y,
+            z: position.z,
+            duration,
+            ease: 'power2.inOut'
+
+        })
+
+        // changer l'angle de vue
+        gsap.to(this.controls.target, 
+        {
+            x: target.x,
+            y: target.y,
+            z: target.z,
+            duration,
+            ease: 'power2.inOut',
+            onUpdate: () =>
+            {
+
+                this.controls.update()
+                this.render()
+
+            },
+            onComplete: () =>
+            {
+
+                this.controls.update()
+                this.render()
+
+                if(onComplete) onComplete()
+
+            }
+
+        })
 
     }
 
@@ -634,6 +499,7 @@ class Viewer
         // initialisé l'horloge
         this.delta = this.clock.getDelta()
 
+        // update du mixer/animations
         if (this.mixer) 
         {
             this.mixer.update(this.delta)
@@ -647,6 +513,7 @@ class Viewer
         requestAnimationFrame(() => this.tick())
 
     }
+
 
     /** 
      * Gizmo
@@ -663,6 +530,7 @@ class Viewer
 
     }
 
+
     addGizmo(size = 1) 
     {
         if(this.gizmo) return
@@ -676,10 +544,356 @@ class Viewer
 }
 
 
+
+/**
+ * STORYMANAGER CLASS
+ */
+class StoryManager 
+{
+    
+    constructor(viewer)
+    {
+
+        this.viewer = viewer
+
+        this.locked = true
+        this.currentScene = null
+
+        this.intro  = new Intro(viewer, this)
+        this.scene1 = new Scene1(viewer, this)
+        this.scene2 = new Scene2(viewer, this)
+        this.scene3 = new Scene3(viewer, this)
+        this.scene4 = new Scene4(viewer, this)
+
+        this.scenes = 
+        {
+
+            intro : this.intro,
+            scene1: this.scene1,
+            scene2: this.scene2,
+            scene3: this.scene3,
+            scene4: this.scene4,
+
+        }
+
+        this.bindEvents()
+
+    }
+
+
+    bindEvents()
+    {
+
+        this.viewer.loader.startBtn.addEventListener('click', () =>
+        {
+
+            if (this.viewer.experienceStarted) return
+            this.viewer.experienceStarted = true
+
+            this.viewer.audioListener.context.resume()
+
+            if (this.viewer.ambienceSound?.buffer && !this.viewer.ambienceSound.isPlaying)
+            {
+                this.viewer.ambienceSound.play()
+            }
+
+            this.goTo('intro')
+
+        })
+
+        window.addEventListener('keydown', (event) =>
+        {
+
+            if (!this.viewer.experienceStarted) return
+            if (this.locked) return
+            if (event.key.toLowerCase() !== 'e') return
+
+            this.currentScene?.interact?.()
+
+        })
+
+    }
+
+
+    goTo(name)
+    {
+
+        if (this.currentScene?.exit)
+        {
+            this.currentScene.exit()
+        }
+
+        this.currentScene = this.scenes[name]
+        this.currentScene?.enter?.()
+
+    }
+
+
+    lock()
+    {
+        this.locked = true
+    }
+
+
+    unlock()
+    {
+        this.locked = false
+    }
+
+}
+
+
+
+/**
+ * INTRO CLASS
+ */
+class Intro
+{
+    
+    constructor(viewer, storyManager)
+    {
+
+        this.viewer = viewer
+        this.storyManager = storyManager
+
+        this.clickBtnSound = new THREE.Audio(this.viewer.audioListener)
+        this.voletSound = new THREE.Audio(this.viewer.audioListener)
+
+        this.loadAudio()
+
+    }
+
+
+    async loadAudio()
+    {
+
+        const btnBuffer = await this.viewer.loader.loadAudio('/son/btn/btn-start.wav')
+        this.clickBtnSound.setBuffer(btnBuffer)
+        this.clickBtnSound.setLoop(false)
+        this.clickBtnSound.setVolume(0.4)
+
+        const voletBuffer = await this.viewer.loader.loadAudio('/son/animations/animations-volets.wav')
+        this.voletSound.setBuffer(voletBuffer)
+        this.voletSound.setLoop(false)
+        this.voletSound.setVolume(1)
+        
+    }
+
+
+    enter()
+    {
+
+        this.storyManager.lock()
+
+        this.viewer.loader.startBtn.disabled = true
+        this.viewer.loader.hideStartUI()
+
+        if (this.clickBtnSound.buffer)
+        {
+            this.clickBtnSound.play()
+        }
+
+        this.playVolets()
+
+        setTimeout(() =>
+        {
+            this.storyManager.unlock()
+        }, 300) // cd avant controls
+
+    }
+
+
+    playVolets()
+    {
+
+        if (this.voletSound.buffer)
+        {
+            this.voletSound.play()
+        }
+
+        if (!this.viewer.mixer || this.viewer.clips.length < 2) return
+
+        const volet0 = this.viewer.clips[0]
+        const volet1 = this.viewer.clips[1]
+
+        const action1 = this.viewer.mixer.clipAction(volet0)
+        const action2 = this.viewer.mixer.clipAction(volet1)
+
+        action1.reset()
+        action1.setLoop(THREE.LoopOnce, 1)
+        action1.clampWhenFinished = true
+        action1.play()
+
+        action2.reset()
+        action2.setLoop(THREE.LoopOnce, 1)
+        action2.clampWhenFinished = true
+        action2.play()
+
+    }
+
+
+    interact()
+    {
+        this.storyManager.goTo('scene1')
+    }
+
+
+    exit()
+    {}
+
+}
+
+
+
+/**
+ * SCENE1 CLASS
+ */
+class Scene1
+{
+
+    constructor(viewer, storyManager)
+    {
+
+        this.viewer = viewer
+        this.storyManager = storyManager
+
+        this.cameraPosition = new THREE.Vector3(-0.7, 0.4, 1)
+        this.cameraTarget = new THREE.Vector3(2.5, -2.5, -1.5)
+
+    }
+
+
+    enter()
+    {
+
+        this.storyManager.lock()
+
+        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 1, () =>
+        {
+
+            /* this.dialogueBox.show("Fée", "Bienvenue dans la scène 1.") */
+            this.storyManager.unlock()
+
+        })
+
+    }
+
+
+    interact()
+    {
+        this.storyManager.goTo('scene2')
+        /* this.dialogueBox.setText("Fée", "Dialogue suivant...") */
+    }
+
+
+    exit()
+    {}
+}
+
+
+
+/**
+ * SCENE2 CLASS
+ */
+class Scene2
+{
+
+    constructor(viewer, storyManager)
+    {
+
+        this.viewer = viewer
+        this.storyManager = storyManager
+
+        this.step = 0
+
+        this.cameraPosition = new THREE.Vector3(-0.6, -0.6, 1.2)
+        this.cameraTarget = new THREE.Vector3(2.4, -1, -2.1)
+
+        // camera pour scène 3 mais code test pour 2 camere et 1 scène
+        this.cameraPosition2 = new THREE.Vector3(0.3, -1.5, 1.5)
+        this.cameraTarget2 = new THREE.Vector3(1.8, -2, -4)
+
+    }
+
+
+    enter()
+    {
+
+        this.storyManager.lock()
+        this.step = 0
+
+        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 2, () =>
+        {
+            this.storyManager.unlock()
+        })
+
+    }
+
+
+    interact()
+    {
+
+        if(this.step === 0)
+        {
+
+            this.storyManager.lock()
+            this.step = 1
+
+            this.viewer.moveCamera(this.cameraPosition2, this.cameraTarget2, 2, () =>
+            {
+                this.storyManager.unlock()
+            })
+
+            return
+
+        }
+
+        this.storyManager.goTo('scene3')
+
+    }
+
+
+    exit()
+    {}
+}
+
+
+
+/**
+ * SCENE3 CLASS
+ */
+class Scene3
+{
+    
+    constructor(viewer)
+    {
+
+    }
+
+}
+
+
+
+/**
+ * SCENE4 CLASS
+ */
+class Scene4
+{
+    
+    constructor(viewer)
+    {
+
+    }
+
+}
+
+
+
 /**
  * myViewer
  */
 const myViewer = new Viewer(threejsOptions);
+const storyManager = new StoryManager(myViewer)
 
 // Ajouter un event resize et appeler la fonction qui gère les changements de tailles
 window.addEventListener("resize", () => 
@@ -688,6 +902,7 @@ window.addEventListener("resize", () =>
     myViewer.resize();
 
 });
+
 
 
 /**
