@@ -39,6 +39,7 @@ class SceneLoader
 
     constructor(scene)
     {
+        // base
         this.scene = scene
         this.progress = 0
 
@@ -98,7 +99,7 @@ class SceneLoader
                     }
 
                 })
-            }, 5000)
+            }, 2000)
         }
 
         // loader gltf
@@ -221,11 +222,39 @@ class Viewer
         // experience
         this.experienceStarted = false
 
+        // mouse
+        this.raycaster = new THREE.Raycaster()
+        this.mouse = new THREE.Vector2()
+        this.currentIntersect = null
+        this.objectsToRaycaster = []
+
+        window.addEventListener('click', () => 
+        {
+            // On vérifie que le jeu tourne et n'est pas bloqué
+            if(this.storyManager && this.experienceStarted && !this.storyManager.locked)
+            {
+                if (this.currentIntersect) 
+                {
+                    this.characterClick(this.currentIntersect.object)
+                }
+                else 
+                {
+                    this.characterInfos = document.querySelector('.character-infos')
+
+                    if(this.characterInfos && !this.characterInfos.classList.contains('hidden')) 
+                    {
+                        this.characterInfos.classList.add('hidden')
+                    }
+                }
+            }
+        })
+
         // audio
         this.audioListener = null
         this.audioLoader = null
         this.ambienceSound = null
 
+        // appel des instances
         this.setRenderer(options);
     }
 
@@ -296,6 +325,7 @@ class Viewer
                 child.material = this.bakedAnimationsMaterial
             }
         })
+        console.log('animations', this.animationsGltf)
 
 
         /* glb personnages */
@@ -307,18 +337,90 @@ class Viewer
             if(child.isMesh)
             {
                 child.material = this.bakedPersonnagesMaterial
+
+                if(child.name.includes('G1_SM_perso')) 
+                {
+                    child.material.emissive = new THREE.Color('#ffddaa')
+                    this.objectsToRaycaster.push(child)
+                }
             }
         })
+        console.log('personnages', this.personnagesGltf)
 
         // Add la scène
         this.scene.add(this.mainGltf.scene, this.animationsGltf.scene, this.personnagesGltf.scene)
-        console.log(this.animationsGltf)
 
         // prépare les clips
         this.mixer = new THREE.AnimationMixer(this.animationsGltf.scene)
         this.clips = this.animationsGltf.animations
 
         this.render()
+    }
+
+
+    /**
+     * Mouse event
+     */
+    mouseEvent()
+    {
+        this.mouse = new THREE.Vector2();
+
+        window.addEventListener('mousemove', (event) =>
+        {
+            this.mouse.x = (event.clientX / settings.sizes.w) * 2 - 1
+            this.mouse.y = -(event.clientY / settings.sizes.h) * 2 + 1
+        })
+    }
+
+    /**
+     * Personnages DOM
+     */
+    characterClick(clickedMesh)
+    {
+        this.characterInfos = document.querySelector('.character-infos')
+        this.characterInfos.classList.remove('hidden')
+        
+        const allTexts = document.querySelectorAll('.character-text')
+        allTexts.forEach((text) => 
+        {
+            text.classList.add('hidden')
+        })
+
+
+        if (clickedMesh.name.includes('persotom')) 
+        {
+            document.querySelector('.character-thomas').classList.remove('hidden')
+        } 
+
+        else if (clickedMesh.name.includes('persojulien')) 
+        {
+            document.querySelector('.character-julien').classList.remove('hidden')
+        }
+
+        else if (clickedMesh.name.includes('persomelanie')) 
+        {
+            document.querySelector('.character-melanie').classList.remove('hidden')
+        }
+
+        else if (clickedMesh.name.includes('persoarthur')) 
+        {
+            document.querySelector('.character-arthur').classList.remove('hidden')
+        }
+
+        else if (clickedMesh.name.includes('persoanna')) 
+        {
+            document.querySelector('.character-anna').classList.remove('hidden')
+        }
+
+        else if (clickedMesh.name.includes('persocarla')) 
+        {
+            document.querySelector('.character-carla').classList.remove('hidden')
+        }
+
+        else if (clickedMesh.name.includes('persosamuel')) 
+        {
+            document.querySelector('.character-samuel').classList.remove('hidden')
+        }
     }
 
 
@@ -452,6 +554,8 @@ class Viewer
         this.loadModel();
         this.loadGlobalAudio()
 
+        this.mouseEvent()
+
         this.populate();
 
         this.tick()
@@ -546,11 +650,79 @@ class Viewer
 
         // initialisé l'horloge
         this.delta = this.clock.getDelta()
+        this.elapsedTime = this.clock.getElapsedTime()
 
         // update du mixer/animations
         if (this.mixer) 
         {
             this.mixer.update(this.delta)
+        }
+
+        
+        /**
+         * Glow
+         * code IA pour simuler un shader
+         */
+        // Math.sin crée une vague entre -1 et 1.
+        const glowIntensity = (Math.sin(this.elapsedTime * 1) + 1) / 2 * 0.05 + 0.01
+
+        // On applique cette intensité à tous les personnages de notre tableau
+        for(const perso of this.objectsToRaycaster)
+        {
+            if(perso.material)
+            {
+                perso.material.emissiveIntensity = glowIntensity
+            }
+        }
+
+
+        /**
+         * Raycaster
+         */
+        // place sur la cam
+        this.raycaster.setFromCamera(this.mouse, this.camera)
+
+        // raycast les objets de notre tableau
+        const intersects = this.raycaster.intersectObjects(this.objectsToRaycaster)
+
+        if(intersects.length && intersects[0].distance < 3)
+        {
+            if(this.currentIntersect === null)
+            {
+                // change le cursor to pointer
+                document.body.style.cursor = 'pointer'
+                console.log("survole de :", intersects[0].object.name)
+
+            }
+            this.currentIntersect = intersects[0]
+
+            // remove
+           /*  gsap.to(intersects[0].object.scale, {
+                x: 1.05, 
+                y: 1.05,
+                z: 1.05,
+                duration: 0.3,
+                ease: "power2.out"
+            }) */
+        }
+        else
+        {
+            if(this.currentIntersect)
+            {
+                // laisse le cursor default
+                document.body.style.cursor = 'default'
+
+                // remove
+               /*  gsap.to(this.currentIntersect.object.scale, {
+                    x: 1, 
+                    y: 1,
+                    z: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                }) */
+                
+            }
+            this.currentIntersect = null
         }
 
 
@@ -628,10 +800,12 @@ class StoryManager
     
     constructor(viewer)
     {
+        // base
         this.viewer = viewer
-
+        this.viewer.storyManager = this
         this.dialogueBox = new DialogueBox()
 
+        // initialisations
         this.locked = true
         this.currentScene = null
 
@@ -654,6 +828,7 @@ class StoryManager
 
         }
 
+        // appel des instances
         this.bindEvents()
     }
 
@@ -728,12 +903,14 @@ class Intro
     
     constructor(viewer, storyManager)
     {
+        // base
         this.viewer = viewer
         this.storyManager = storyManager
 
         this.clickBtnSound = new THREE.Audio(this.viewer.audioListener)
         this.voletSound = new THREE.Audio(this.viewer.audioListener)
 
+        // appel des instances
         this.loadAudio()
     }
 
@@ -817,8 +994,11 @@ class Scene1
 
     constructor(viewer, storyManager)
     {
+        // base
         this.viewer = viewer
         this.storyManager = storyManager
+
+        // initialisations
         this.step = 0
 
         // camera scène 1
@@ -905,8 +1085,11 @@ class Scene2
 
     constructor(viewer, storyManager)
     {
+        // base
         this.viewer = viewer
         this.storyManager = storyManager
+
+        // initialisations
         this.step = 0
 
         // camera scène 2
@@ -982,8 +1165,11 @@ class Scene3
     
     constructor(viewer, storyManager)
     {
+        // base
         this.viewer = viewer
         this.storyManager = storyManager
+
+        // initialisations
         this.step = 0
 
         // camera scène 3 
@@ -1058,8 +1244,11 @@ class Scene4
     
     constructor(viewer, storyManager)
     {
+        // base
         this.viewer = viewer
         this.storyManager = storyManager
+
+        // initialisations
         this.step = 0
 
         // camera scène 4 
@@ -1133,8 +1322,11 @@ class Outro
     
     constructor(viewer, storyManager)
     {
+        // base
         this.viewer = viewer
         this.storyManager = storyManager
+
+        // initialisations
         this.step = 0
 
         // camera main

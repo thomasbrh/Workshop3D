@@ -162,6 +162,23 @@ html {
 
 
 
+/* characters infos*/
+.character-infos {
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    translate: -50% -50%;
+
+    width: min(1000px, 90%);
+    padding: 2rem;
+    border-radius: 4rem;
+    background: rgba(0, 0, 0, 0.50);
+    color: white;
+    z-index: 20;
+}
+
+
+
 /* hidden */
 .hidden {
   display: none;
