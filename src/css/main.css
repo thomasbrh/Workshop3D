@@ -1,3 +1,10 @@
+html {
+    font-family: Caveat;
+    font-size: 26px;
+}
+
+
+
 /* canvas */
 .canvas__wrapper 
 {
@@ -32,7 +39,7 @@
     z-index: 1000;
 
     width: 25%;
-    height: 4px;
+    height: 8px;
 
     left: 50%;
     top: 50%;
@@ -101,16 +108,16 @@
     translate: -50% -50%;
 
     font-size: 45px;
-    padding: 2rem 4rem;
+    padding: 1.5rem 3rem;
 
     color: white;
-    background-color:burlywood;
+    background-color:rgb(0, 115, 0);
     border-radius: 3rem;
 }
 .start-btn:hover 
 {
-    transform: scale(1.1);
-    background-color:saddlebrown;
+    transform: scale(1.03);
+    background-color:rgb(50, 140, 50);
 }
 
 .start-btn.hidden 
@@ -122,18 +129,40 @@
 
 
 
-/* paragraph */
+/* instructions */
 .instructions 
 {
     position: fixed;
+    z-index: 1000;
 
     top: 2rem;
     left: 2rem;
     
-    font-family: Caveat;
-    font-size: 21px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     color: #FFF;
+}
+
+
+
+/* dialogues */
+.dialogue-box {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  width: min(700px, 90%);
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.50);
+  color: white;
+  z-index: 20;
+}
+
+
+
+/* hidden */
+.hidden {
+  display: none;
 }
