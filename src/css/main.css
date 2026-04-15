@@ -38,7 +38,7 @@ html {
 /* loading bar */
 .loading-bar-wrapper {
     position: absolute;
-    z-index: 1000;
+    z-index: 100000000000;
 
     width: 25%;
     height: 8px;
@@ -53,12 +53,13 @@ html {
     inset: 0;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 999px;
+    z-index: 1000;
 }
 
 .loading-bar {
     position: absolute;
     inset: 0;
-
+    z-index: 1000;
     background: #ffffff;
     border-radius: 999px;
 
@@ -150,7 +151,8 @@ html {
     width: min(700px, 90%);
     padding: 2rem 1rem;
     border-radius: 1rem;
-    background: rgba(108, 67, 17, 0.7);
+    background: url(../../static/svg/fond_dialogue.svg) center / cover no-repeat;
+    background-blend-mode: lighten;
     color: white;
     z-index: 20;
 
@@ -175,14 +177,14 @@ html {
     transform: translateX(-50%);
     width: 100%;
     height: 150px;
-    z-index: 10;
+    z-index: 3;
 }
 
 
 
 .button__back {
     position: fixed;
-    z-index: 1000;
+    z-index: 3;
     height: 75px;
     width: 100%;
     display: flex;
@@ -191,6 +193,7 @@ html {
     bottom: 1rem;
     left: 50%;
     transform: translateX(-50%);
+
 }
 
 .button__back .button_left {
@@ -213,6 +216,7 @@ html {
 
 .button_left svg path {
     fill: rgb(255, 255, 255);
+    padding: 0;
 }
 
 .button_left:hover {
@@ -266,4 +270,13 @@ html {
     position: absolute;
     left: 0;
     display: none;
+}
+
+.button_toggle-sound {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
