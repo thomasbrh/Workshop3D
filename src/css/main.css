@@ -124,23 +124,17 @@ html {
     z-index: -1000;
 }
 
-
-
 /* instructions */
 .instructions {
     position: fixed;
     z-index: 1000;
-
     top: 2rem;
     left: 2rem;
-
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     color: #FFF;
 }
-
-
 
 /* dialogues */
 .dialogue-box {
