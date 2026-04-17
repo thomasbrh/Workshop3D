@@ -149,7 +149,7 @@ html {
     bottom: 1rem;
     transform: translateX(-50%);
     width: min(700px, 90%);
-    padding: 2rem 1rem;
+    padding: 1rem 0.5rem;
     border-radius: 1rem;
     background: url(../../static/svg/fond_dialogue.svg) center / cover no-repeat;
     background-blend-mode: lighten;
@@ -243,9 +243,10 @@ html {
     background-color: rgb(183, 122, 57);
     rotate: 90deg;
     cursor: pointer;
-    background: url(../../static/svg/Decor_Button.svg);
+    background: url(../../static/svg/Decor_Button.svg) center / cover no-repeat;
     transition: all 0.3s ease;
 }
+
 
 .button_right svg path {
     fill: rgb(255, 255, 255);
