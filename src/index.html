@@ -1,32 +1,68 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>L'histoire d'Altera</title>
-        <link rel="stylesheet" href="/css/reset.css" />
-        <link rel="stylesheet" href="/css/main.css" />
-        <script src="/js/main.js" type="module" defer></script>
-    </head>
-    <body class="page">
-        <div class="page__wrapper">
-            <main class="page__content">
-                <!-- loading in progress -->
-                <div class="loading-bar-wrapper">
-                    <div class="loading-bar-bg"></div>
-                    <div class="loading-bar"></div>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>L'histoire d'Altera</title>
+    <link rel="stylesheet" href="/css/reset.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    <script src="/js/main.js" type="module" defer></script>
+</head>
+
+<body class="page">
+    <div class="page__wrapper">
+        <main class="page__content">
+            <!-- loading in progress -->
+            <div class="loading-bar-wrapper">
+                <div class="loading-bar-bg"></div>
+                <div class="loading-bar"></div>
+            </div>
+
+
+            <!-- ATH -->
+            <button class="start-btn hidden">Découvrir</button>
+            <div class="blur-overlay hidden"></div>
+
+            <!-- Bouton-->
+            <div class="button__back">
+                <div class="button_left">
+                    <button class="button_toggle-sound" data-muted="false">
+                        <svg class="icon-song" xmlns="http://www.w3.org/2000/svg" width="45" height="45"
+                            viewBox="0 0 48 48">
+                            <path fill="currentColor"
+                                d="M25.081 6.419C26.208 5.408 28 6.207 28 7.72v32.56c0 1.514-1.792 2.313-2.919 1.302l-8.206-7.366A4.75 4.75 0 0 0 13.702 33H9a5.25 5.25 0 0 1-5.25-5.25v-7.5C3.75 17.35 6.1 15 9 15h4.702a4.75 4.75 0 0 0 3.173-1.216zm11.257 1.977a1.25 1.25 0 0 1 1.766-.058l.011.01l-.01-.01l.001.002l.003.002l.006.006l.019.018l.06.058q.074.075.202.21c.17.179.404.44.682.782a20.4 20.4 0 0 1 2.016 3.005C42.552 15.059 44 18.953 44 24s-1.448 8.94-2.906 11.58a20.4 20.4 0 0 1-2.016 3.004a15 15 0 0 1-.885.992l-.06.058l-.018.018l-.006.006l-.003.002v.001s.66-.661-.002 0a1.25 1.25 0 0 1-1.711-1.822l.002-.001l.003-.003l.032-.032q.047-.046.147-.15c.131-.14.326-.356.563-.648a18 18 0 0 0 1.766-2.635C40.198 32.034 41.5 28.553 41.5 24s-1.302-8.034-2.594-10.37a18 18 0 0 0-1.766-2.636a12 12 0 0 0-.71-.798l-.032-.032l-.003-.003l-.002-.002a1.25 1.25 0 0 1-.055-1.764M32.334 14.4a1.25 1.25 0 0 1 1.767-.066l.064.062l-.064-.06h.001l.002.002l.005.005l.014.012l.042.041q.051.05.137.139c.113.118.269.287.452.505c.366.436.847 1.072 1.326 1.893A14 14 0 0 1 38 24c0 3.023-.963 5.426-1.92 7.068c-.48.82-.96 1.457-1.326 1.893a10 10 0 0 1-.59.644l-.019.019l-.022.021l-.014.013l-.005.005l-.003.003l.008-.008l-.008.008a1.25 1.25 0 0 1-1.705-1.828l.002-.002l.016-.016l.085-.086a8 8 0 0 0 .34-.381c.29-.346.685-.866 1.081-1.545A11.5 11.5 0 0 0 35.5 24c0-2.477-.787-4.449-1.58-5.807c-.396-.68-.79-1.2-1.08-1.545a8 8 0 0 0-.426-.467l-.017-.017l.001.001a1.25 1.25 0 0 1-.064-1.765" />
+                        </svg>
+                        <svg class="icon-mute hidden" xmlns="http://www.w3.org/2000/svg" width="50" height="50"
+                            viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="m9 9.707l5.146 5.147a.5.5 0 0 0 .708-.708l-13-13a.5.5 0 1 0-.708.708l3.14 3.139H3.5a1.5 1.5 0 0 0-1.5 1.5v2.989a1.5 1.5 0 0 0 1.5 1.5h1.723l2.926 2.875A.5.5 0 0 0 9 13.5zm2.709-.12l-.795-.794c.055-.232.09-.497.09-.794c0-.748-.219-1.284-.428-1.628a2.4 2.4 0 0 0-.369-.465l-.018-.016h.001a.5.5 0 0 1 .623-.781h.001l.001.001l.002.002l.006.004l.015.013l.045.04q.056.05.142.142c.114.123.26.302.405.54c.292.48.574 1.193.574 2.148a4.3 4.3 0 0 1-.295 1.589m1.517 1.518l-.745-.745a5.5 5.5 0 0 0 .522-2.356a5.54 5.54 0 0 0-.919-3.069a5.5 5.5 0 0 0-.63-.794a4 4 0 0 0-.253-.24l-.011-.01a.5.5 0 0 1 .623-.782l.001.001l.003.002l.007.006l.022.019q.028.022.076.066c.062.056.15.138.252.245c.205.213.476.527.746.938a6.54 6.54 0 0 1 1.083 3.618a6.5 6.5 0 0 1-.777 3.1M8.999 6.878L6.181 4.06l1.97-1.918a.5.5 0 0 1 .848.358z" />
+                        </svg>
+                    </button>
                 </div>
+                <button class="button_right ">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24">
+                        <path fill="currentColor"
+                            d="M12.884 5.116a1.253 1.253 0 0 0-1.768 0l-5 5a1.25 1.25 0 0 0 1.768 1.768l2.866-2.866V18a1.25 1.25 0 1 0 2.5 0V9.018l2.866 2.866a1.25 1.25 0 1 0 1.768-1.768z" />
+                    </svg>
+                </button>
+            </div>
 
 
-                <button class="start-btn hidden">Découvrir</button>
-                <div class="blur-overlay hidden"></div>
+            <div class="Elgraphique"></div>
 
 
-                <!-- instructions -->
-                <p class="instructions hidden">Appuyer sur E pour continuer</p>
+            <!-- dialogue -->
+            <div class="dialogue-box hidden">
+                <p class="dialogue-text"></p>
+            </div>
 
 
-                <!-- infos sur les personnages -->
+
+            <!-- infos sur les personnages -->
                 <div class="character-infos hidden">
                     <p class="character-text character-thomas hidden">
                         Hello, Je m’appelle Thomas, étudiant en 2e année en interface design et développement à la Haute École Albert Jacquard.
@@ -49,17 +85,11 @@
                 </div>
 
 
-                <!-- dialogue -->
-                <div class="dialogue-box hidden">
-                    <p class="dialogue-text"></p>
-                </div>
-                
-
-                <!-- canvas threre.js  -->
-                <div class="canvas__wrapper | js-canvas-wrapper">
-                    <canvas class="canvas | js-canvas-3d"></canvas>
-                </div>
-            </main>
-        </div>
-    </body>
+            <!-- canvas threre.js  -->
+            <div class="canvas__wrapper | js-canvas-wrapper">
+                <canvas class="canvas | js-canvas-3d"></canvas>
+            </div>
+        </main>
+    </div>
+</body>
 </html>
