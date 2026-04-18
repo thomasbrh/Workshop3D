@@ -3,15 +3,11 @@ html {
     font-size: 26px;
 }
 
-.page__content {
-    height: 100vh;
-    overflow: hidden;
-}
-
 
 
 /* canvas */
-.canvas__wrapper {
+.canvas__wrapper 
+{
     z-index: 0;
     position: relative;
     display: block;
@@ -22,7 +18,8 @@ html {
     overflow: hidden;
 }
 
-.canvas {
+.canvas 
+{
     z-index: 0;
     position: fixed;
 
@@ -36,9 +33,10 @@ html {
 
 
 /* loading bar */
-.loading-bar-wrapper {
+.loading-bar-wrapper
+{
     position: absolute;
-    z-index: 100000000000;
+    z-index: 1000;
 
     width: 25%;
     height: 8px;
@@ -48,18 +46,19 @@ html {
     translate: -50% -50%;
 }
 
-.loading-bar-bg {
+.loading-bar-bg
+{
     position: absolute;
     inset: 0;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 999px;
-    z-index: 1000;
 }
 
-.loading-bar {
+.loading-bar
+{
     position: absolute;
     inset: 0;
-    z-index: 1000;
+
     background: #ffffff;
     border-radius: 999px;
 
@@ -68,8 +67,8 @@ html {
     transition: transform 0.8s linear, opacity 0.1s ease;
 }
 
-.loading-bar.ended,
-.loading-bar-bg.ended {
+.loading-bar.ended, .loading-bar-bg.ended
+{
     opacity: 0;
     pointer-events: none;
 }
@@ -77,7 +76,8 @@ html {
 
 
 /* blur */
-.blur-overlay {
+.blur-overlay 
+{
     z-index: 100;
     position: fixed;
 
@@ -89,7 +89,8 @@ html {
     background: rgba(0, 0, 0, 0.15);
 }
 
-.blur-overlay.hidden {
+.blur-overlay.hidden 
+{
     display: none;
     z-index: -1000;
 }
@@ -97,10 +98,11 @@ html {
 
 
 /* start-btn */
-.start-btn {
+.start-btn 
+{
     z-index: 1000;
     position: fixed;
-    font-family: "Caveat", cursive;
+    
     top: 50%;
     left: 50%;
     translate: -50% -50%;
@@ -109,16 +111,17 @@ html {
     padding: 1.5rem 3rem;
 
     color: white;
-    background-color: rgb(0, 115, 0);
+    background-color:rgb(0, 115, 0);
     border-radius: 3rem;
 }
-
-.start-btn:hover {
+.start-btn:hover 
+{
     transform: scale(1.03);
-    background-color: rgb(50, 140, 50);
+    background-color:rgb(50, 140, 50);
 }
 
-.start-btn.hidden {
+.start-btn.hidden 
+{
     display: none;
     pointer-events: none;
     z-index: -1000;
@@ -127,13 +130,14 @@ html {
 
 
 /* instructions */
-.instructions {
+.instructions 
+{
     position: fixed;
     z-index: 1000;
 
     top: 2rem;
     left: 2rem;
-
+    
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -144,18 +148,16 @@ html {
 
 /* dialogues */
 .dialogue-box {
-    position: absolute;
-    left: 50%;
-    bottom: 1rem;
-    transform: translateX(-50%);
-    width: min(700px, 90%);
-    padding: 2rem 1rem;
-    border-radius: 1rem;
-    background: url(../../static/svg/fond_dialogue.svg) center / cover no-repeat;
-    background-blend-mode: lighten;
-    color: white;
-    z-index: 20;
-
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  width: min(700px, 90%);
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.50);
+  color: white;
+  z-index: 20;
 }
 
 
@@ -179,121 +181,5 @@ html {
 
 /* hidden */
 .hidden {
-    display: none;
-}
-
-
-.Elgraphique {
-    background: url(../../static/svg/Element_threeJs.svg);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    position: absolute;
-    left: 50%;
-    top: 1rem;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 150px;
-    z-index: 3;
-}
-
-
-
-.button__back {
-    position: fixed;
-    z-index: 3;
-    height: 75px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-
-}
-
-.button__back .button_left {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    margin-left: 1rem;
-    border: 2px solid rgb(108, 67, 17);
-    border-radius: 500px;
-    padding: 0.5rem;
-    background-color: rgb(183, 122, 57);
-    cursor: pointer;
-    background: url(../../static/svg/Decor_Button.svg);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    transition: all 0.3s ease;
-}
-
-.button_left svg path {
-    fill: rgb(255, 255, 255);
-    padding: 0;
-}
-
-.button_left:hover {
-    background-color: rgb(108, 67, 17);
-    scale: 1.1;
-
-    transition: all 0.3s ease;
-
-    svg path {
-        fill: rgb(183, 122, 57);
-    }
-
-}
-
-.button__back .button_right {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    margin-right: 1rem;
-    border: 2px solid rgb(108, 67, 17);
-    border-radius: 500px;
-    padding: 0.5rem;
-    background-color: rgb(183, 122, 57);
-    rotate: 90deg;
-    cursor: pointer;
-    background: url(../../static/svg/Decor_Button.svg);
-    transition: all 0.3s ease;
-}
-
-.button_right svg path {
-    fill: rgb(255, 255, 255);
-}
-
-.button_right:hover {
-    background-color: rgb(108, 67, 17);
-    scale: 1.1;
-    transition: all 0.3s ease;
-
-    svg path {
-        fill: rgb(183, 122, 57);
-    }
-}
-
-.button_song,
-.button_mute {
-    display: flex;
-}
-
-.button_mute {
-    position: absolute;
-    left: 0;
-    display: none;
-}
-
-.button_toggle-sound {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: none;
 }
