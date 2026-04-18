@@ -267,7 +267,7 @@ class Viewer
         /**
          * texture des animations
          */
-        this.bakedAnimationsTexture = await this.loader.loadTexture('/textures/animations/bakedAnimationsTexture.webp')
+        this.bakedAnimationsTexture = await this.loader.loadTexture('/textures/animations/animations_baked.webp')
         this.bakedAnimationsTexture.flipY = false
         this.bakedAnimationsTexture.colorSpace = THREE.SRGBColorSpace
 
@@ -280,7 +280,7 @@ class Viewer
         /**
          * textures des personnages
          */
-        this.bakedPersonnagesTexture = await this.loader.loadTexture('/textures/personnages/bakedPersonnagesTexture.webp')
+        this.bakedPersonnagesTexture = await this.loader.loadTexture('/textures/personnages/personnage_baked.webp')
         this.bakedPersonnagesTexture.flipY = false
         this.bakedPersonnagesTexture.colorSpace = THREE.SRGBColorSpace
 
@@ -317,7 +317,7 @@ class Viewer
 
 
         /**
-         * glb salon-droite
+         * texture salon-droite
          */
         this.bakedSalonDroite = await this.loader.loadTexture('/textures/salon-droite/salon-droite_baked.webp')
         this.bakedSalonDroite.flipY = false
@@ -330,9 +330,9 @@ class Viewer
 
 
         /**
-         * glb salon-gauche
+         * texture salon-gauche
          */
-        this.bakedSalonGauche = await this.loader.loadTexture('/textures/salon-gauche/salon-gauche_baked.webp')
+        this.bakedSalonGauche = await this.loader.loadTexture('/textures/salon-gauche/salongauche_baking.webp')
         this.bakedSalonGauche.flipY = false
         this.bakedSalonGauche.colorSpace = THREE.SRGBColorSpace
 
@@ -341,7 +341,211 @@ class Viewer
             map: this.bakedSalonGauche
         })
 
+
+        /**
+         * texture salledebain-gauche
+         */
+        this.bakedSdbGauche = await this.loader.loadTexture('/textures/salledebain-gauche/douche_gauche_baked.webp')
+        this.bakedSdbGauche.flipY = false
+        this.bakedSdbGauche.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedSdbGaucheMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedSdbGauche
+        })
+
+        // evier
+        this.bakedSdbGaucheEvier = await this.loader.loadTexture('/textures/salledebain-gauche/douche_gauche_evier_baked.webp')
+        this.bakedSdbGaucheEvier.flipY = false
+        this.bakedSdbGaucheEvier.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedSdbGaucheEvierMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedSdbGaucheEvier
+        })
+
+        // perso
+        this.bakedSdbGauchePerso = await this.loader.loadTexture('/textures/salledebain-gauche/douche_gauche_perso_baked.webp')
+        this.bakedSdbGauchePerso.flipY = false
+        this.bakedSdbGauchePerso.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedSdbGauchePersoMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedSdbGauchePerso
+        })
+
+
+        /**
+         * texture salledebain-droite
+         */
+        this.bakedSdbDroiteDouche = await this.loader.loadTexture('/textures/salledebain-droite/douche-salledebain-droite.webp')
+        this.bakedSdbDroiteDouche.flipY = false
+        this.bakedSdbDroiteDouche.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedSdbDroiteDoucheMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedSdbDroiteDouche
+        })
+
+        // evier
+        this.bakedSdbDroiteEvier = await this.loader.loadTexture('/textures/salledebain-droite/evier-salledebain-droite.webp')
+        this.bakedSdbDroiteEvier.flipY = false
+        this.bakedSdbDroiteEvier.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedSdbDroiteEvierMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedSdbDroiteEvier
+        })
         
+
+        /**
+         * texture gardemanger-gauche
+         */
+        // meuble 1
+        this.bakedGmGaucheMeuble1 = await this.loader.loadTexture('/textures/gardemanger-gauche/gardem-gauche-meuble1-baked.webp')
+        this.bakedGmGaucheMeuble1.flipY = false
+        this.bakedGmGaucheMeuble1.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmGaucheMeuble1Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmGaucheMeuble1
+        })
+
+        // meuble 2
+        this.bakedGmGaucheMeuble2 = await this.loader.loadTexture('/textures/gardemanger-gauche/gardem-gauche-meuble2-baked.webp')
+        this.bakedGmGaucheMeuble2.flipY = false
+        this.bakedGmGaucheMeuble2.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmGaucheMeuble2Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmGaucheMeuble2
+        })
+
+        // n1
+        this.bakedGmGaucheN1 = await this.loader.loadTexture('/textures/gardemanger-gauche/gardem-gauche-n1-baked.webp')
+        this.bakedGmGaucheN1.flipY = false
+        this.bakedGmGaucheN1.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmGaucheN1Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmGaucheN1
+        })
+
+        // n2
+        this.bakedGmGaucheN2 = await this.loader.loadTexture('/textures/gardemanger-gauche/gardem-gauche-n2-baked.webp')
+        this.bakedGmGaucheN2.flipY = false
+        this.bakedGmGaucheN2.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmGaucheN2Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmGaucheN2
+        })
+
+
+        /**
+         * texture gardemanger-droite
+         */
+        // meuble 1
+        this.bakedGmDroiteMeuble1 = await this.loader.loadTexture('/textures/gardemanger-droite/gardemanger-meuble1-droite-baked.webp')
+        this.bakedGmDroiteMeuble1.flipY = false
+        this.bakedGmDroiteMeuble1.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmDroiteMeuble1Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmDroiteMeuble1
+        })
+        // meuble 2
+        this.bakedGmDroiteMeuble2 = await this.loader.loadTexture('/textures/gardemanger-droite/gardemanger-meuble2-droite-baked.webp')
+        this.bakedGmDroiteMeuble2.flipY = false
+        this.bakedGmDroiteMeuble2.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmDroiteMeuble2Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmDroiteMeuble2
+        })
+        // coffre
+        this.bakedGmDroiteCoffre = await this.loader.loadTexture('/textures/gardemanger-droite/gardemanger-coffre-droite-baked.webp')
+        this.bakedGmDroiteCoffre.flipY = false
+        this.bakedGmDroiteCoffre.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmDroiteCoffreMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmDroiteCoffre
+        })
+        // table
+        this.bakedGmDroiteTable = await this.loader.loadTexture('/textures/gardemanger-droite/gardemanger-droite-table-baked.webp')
+        this.bakedGmDroiteTable.flipY = false
+        this.bakedGmDroiteTable.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedGmDroiteTableMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedGmDroiteTable
+        })
+
+
+        /**
+         * texture dortoir-gauche
+         */
+        // meuble
+        this.bakedDortoirGaucheMeuble = await this.loader.loadTexture('/textures/dortoir-gauche/meubledort-gauche_baked.webp')
+        this.bakedDortoirGaucheMeuble.flipY = false
+        this.bakedDortoirGaucheMeuble.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedDortoirGaucheMeubleMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedDortoirGaucheMeuble
+        })
+        // hammac 1
+        this.bakedDortoirGaucheHammac1 = await this.loader.loadTexture('/textures/dortoir-gauche/hammac1dort-gauche_baked.webp')
+        this.bakedDortoirGaucheHammac1.flipY = false
+        this.bakedDortoirGaucheHammac1.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedDortoirGaucheHammac1Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedDortoirGaucheHammac1
+        })
+        // hammac 2
+        this.bakedDortoirGaucheHammac2 = await this.loader.loadTexture('/textures/dortoir-gauche/hammac2dort-gauche_baked.webp')
+        this.bakedDortoirGaucheHammac2.flipY = false
+        this.bakedDortoirGaucheHammac2.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedDortoirGaucheHammac2Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedDortoirGaucheHammac2
+        })
+
+
+        /**
+         * texture dortoir-droite
+         */
+        // meuble
+        this.bakedDortoirDroiteMeuble = await this.loader.loadTexture('/textures/dortoir-droite/dortoir-meuble-droite-baked.webp')
+        this.bakedDortoirDroiteMeuble.flipY = false
+        this.bakedDortoirDroiteMeuble.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedDortoirDroiteMeubleMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedDortoirDroiteMeuble
+        })
+        // hammac 1
+        this.bakedDortoirDroiteHammac1 = await this.loader.loadTexture('/textures/dortoir-droite/hammac1-droite-dortoir-baked.webp')
+        this.bakedDortoirDroiteHammac1.flipY = false
+        this.bakedDortoirDroiteHammac1.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedDortoirDroiteHammac1Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedDortoirDroiteHammac1
+        })
+        // hammac 2
+        this.bakedDortoirDroiteHammac2 = await this.loader.loadTexture('/textures/dortoir-droite/hammac2-droite-dortoir-baked.webp')
+        this.bakedDortoirDroiteHammac2.flipY = false
+        this.bakedDortoirDroiteHammac2.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedDortoirDroiteHammac2Material = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedDortoirDroiteHammac2
+        })
+
     }
 
 
@@ -449,6 +653,251 @@ class Viewer
 
 
 
+        /**
+         * glb salledebain-gauche
+         */
+        this.SdbGaucheGltf = await this.loader.loadGLTF('/glb/salledebain-gauche/douche-gauche.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.SdbGaucheGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedSdbGaucheMaterial
+            }
+        })
+
+        // evier
+        this.SdbGaucheEvierGltf = await this.loader.loadGLTF('/glb/salledebain-gauche/douche-gauche-evier.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.SdbGaucheEvierGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedSdbGaucheEvierMaterial
+            }
+        })
+
+        // perso
+        this.SdbGauchePersoGltf = await this.loader.loadGLTF('/glb/salledebain-gauche/douche-gauche-perso.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.SdbGauchePersoGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedSdbGauchePersoMaterial
+            }
+        })
+
+
+        /**
+         * glb salledebain-droite
+         */
+        this.SdbDroiteDoucheGltf = await this.loader.loadGLTF('/glb/salledebain-droite/douche-salledebain-droite.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.SdbDroiteDoucheGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedSdbDroiteDoucheMaterial
+            }
+        })
+
+        // evier
+        this.SdbDroiteEvierGltf = await this.loader.loadGLTF('/glb/salledebain-droite/evier-salledebain-droite.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.SdbDroiteEvierGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedSdbDroiteEvierMaterial
+            }
+        })
+
+
+        /**
+         * glb gardemanger-gauche
+         */
+        // meuble 1
+        this.GmGaucheMeuble1Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-meuble1.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmGaucheMeuble1Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmGaucheMeuble1Material
+            }
+        })
+
+        // meuble 2
+        this.GmGaucheMeuble2Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-meuble2.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmGaucheMeuble2Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmGaucheMeuble2Material
+            }
+        })
+
+        // n1
+        this.GmGaucheN1Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-n1.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmGaucheN1Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmGaucheN1Material
+            }
+        })
+
+        // n2
+        this.GmGaucheN2Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-n2.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmGaucheN2Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmGaucheN2Material
+            }
+        })
+
+
+        /**
+         * glb gardemanger-droite
+         */
+        // meuble 1
+        this.GmDroiteMeuble1Gltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-meuble1-droite.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmDroiteMeuble1Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmDroiteMeuble1Material
+            }
+        })
+        // meuble 2
+        this.GmDroiteMeuble2Gltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-meuble2-droite.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmDroiteMeuble2Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmDroiteMeuble2Material
+            }
+        })
+        // coffre
+        this.GmDroiteCoffreGltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-coffre-droite.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmDroiteCoffreGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmDroiteCoffreMaterial
+            }
+        })
+        // table
+        this.GmDroiteTableGltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-droite-table.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.GmDroiteTableGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedGmDroiteTableMaterial
+            }
+        })
+
+
+        /**
+         * glb dortoir-gauche
+         */
+        // meuble
+        this.DortoirGaucheMeubleGltf = await this.loader.loadGLTF('/glb/dortoir-gauche/meubledort-gauche.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.DortoirGaucheMeubleGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedDortoirGaucheMeubleMaterial
+            }
+        })
+        // hammac 1
+        this.DortoirGaucheHammac1Gltf = await this.loader.loadGLTF('/glb/dortoir-gauche/hammac1dort-gauche.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.DortoirGaucheHammac1Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedDortoirGaucheHammac1Material
+            }
+        })
+
+        // hammac 2
+        this.DortoirGaucheHammac2Gltf = await this.loader.loadGLTF('/glb/dortoir-gauche/hammac2dort-gauche.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.DortoirGaucheHammac2Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedDortoirGaucheHammac2Material
+            }
+        })
+
+
+        /**
+         * glb dortoir-gauche
+         */
+        // meuble
+        this.DortoirDroiteMeubleGltf = await this.loader.loadGLTF('/glb/dortoir-droite/dortoir-meuble-droite.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.DortoirDroiteMeubleGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedDortoirDroiteMeubleMaterial
+            }
+        })
+        // hammac 1
+        this.DortoirDroiteHammac1Gltf = await this.loader.loadGLTF('/glb/dortoir-droite/hammac1-droite-dortoir.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.DortoirDroiteHammac1Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedDortoirDroiteHammac1Material
+            }
+        })
+
+        // hammac 2
+        this.DortoirDroiteHammac2Gltf = await this.loader.loadGLTF('/glb/dortoir-droite/hammac2-droite-dortoir.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.DortoirDroiteHammac2Gltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedDortoirDroiteHammac2Material
+            }
+        })
+
+
         // Add la scène
         this.scene.add
         (
@@ -461,7 +910,31 @@ class Viewer
             this.SalonDroiteGltf.scene, 
             this.SalonGaucheGltf.scene,
 
+            this.SdbGaucheGltf.scene,
+            this.SdbGaucheEvierGltf.scene,
+            this.SdbGauchePersoGltf.scene,
+
+            this.SdbDroiteDoucheGltf.scene,
+            this.SdbDroiteEvierGltf.scene,
+
+            this.GmGaucheMeuble1Gltf.scene,
+            this.GmGaucheMeuble2Gltf.scene,
+            this.GmGaucheN1Gltf.scene,
+            this.GmGaucheN2Gltf.scene,
+
+            this.GmDroiteMeuble1Gltf.scene,
+            this.GmDroiteMeuble2Gltf.scene,
+            this.GmDroiteCoffreGltf.scene,
+            this.GmDroiteTableGltf.scene,
+
+            this.DortoirGaucheMeubleGltf.scene,
+            this.DortoirGaucheHammac1Gltf.scene,
+            this.DortoirGaucheHammac2Gltf.scene,
             
+            this.DortoirDroiteMeubleGltf.scene,
+            this.DortoirDroiteHammac1Gltf.scene,
+            this.DortoirDroiteHammac2Gltf.scene,
+
         )
 
         // prépare les clips
