@@ -264,18 +264,10 @@ class Viewer
      */
     async loadTexture()
     {
-        /* texture principale */
-        this.bakedImageTexture = await this.loader.loadTexture('/textures/bakedImageTexture.webp')
-        this.bakedImageTexture.flipY = false
-        this.bakedImageTexture.colorSpace = THREE.SRGBColorSpace
-
-        this.bakedImageMaterial = new THREE.MeshStandardMaterial(
-        {
-            map: this.bakedImageTexture
-        })
-
-        /* texture des animations */
-        this.bakedAnimationsTexture = await this.loader.loadTexture('/textures/bakedAnimationsTexture.webp')
+        /**
+         * texture des animations
+         */
+        this.bakedAnimationsTexture = await this.loader.loadTexture('/textures/animations/bakedAnimationsTexture.webp')
         this.bakedAnimationsTexture.flipY = false
         this.bakedAnimationsTexture.colorSpace = THREE.SRGBColorSpace
 
@@ -284,8 +276,11 @@ class Viewer
             map: this.bakedAnimationsTexture
         })
 
-        /* texture des personnages */
-        this.bakedPersonnagesTexture = await this.loader.loadTexture('/textures/bakedPersonnagesTexture.webp')
+
+        /**
+         * textures des personnages
+         */
+        this.bakedPersonnagesTexture = await this.loader.loadTexture('/textures/personnages/bakedPersonnagesTexture.webp')
         this.bakedPersonnagesTexture.flipY = false
         this.bakedPersonnagesTexture.colorSpace = THREE.SRGBColorSpace
 
@@ -293,6 +288,60 @@ class Viewer
         {
             map: this.bakedPersonnagesTexture
         })
+
+
+        /**
+         * texture outside
+         */
+        this.bakedOutside = await this.loader.loadTexture('/textures/outside/outside_baked.webp')
+        this.bakedOutside.flipY = false
+        this.bakedOutside.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedOutsideMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedOutside
+        })
+
+
+        /**
+         * texture tree
+         */
+        this.bakedTree = await this.loader.loadTexture('/textures/tree/tree_baked.webp')
+        this.bakedTree.flipY = false
+        this.bakedTree.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedTreeMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedTree
+        })
+
+
+        /**
+         * glb salon-droite
+         */
+        this.bakedSalonDroite = await this.loader.loadTexture('/textures/salon-droite/salon-droite_baked.webp')
+        this.bakedSalonDroite.flipY = false
+        this.bakedSalonDroite.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedSalonDroiteMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedSalonDroite
+        })
+
+
+        /**
+         * glb salon-gauche
+         */
+        this.bakedSalonGauche = await this.loader.loadTexture('/textures/salon-gauche/salon-gauche_baked.webp')
+        this.bakedSalonGauche.flipY = false
+        this.bakedSalonGauche.colorSpace = THREE.SRGBColorSpace
+
+        this.bakedSalonGaucheMaterial = new THREE.MeshStandardMaterial(
+        {
+            map: this.bakedSalonGauche
+        })
+
+        
     }
 
 
@@ -301,20 +350,9 @@ class Viewer
      */
     async loadModel() 
     {
-        /* glb principal */
-        this.mainGltf = await this.loader.loadGLTF('/glb/G1_interieur.glb')
-
-        // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.mainGltf.scene.traverse((child) =>
-        {
-            if(child.isMesh)
-            {
-                child.material = this.bakedImageMaterial
-            }
-        })
-
-
-        /* glb animations */
+        /**
+         * glb animations
+         */
         this.animationsGltf = await this.loader.loadGLTF('/glb/animations/animations.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
@@ -328,7 +366,9 @@ class Viewer
         console.log('animations', this.animationsGltf)
 
 
-        /* glb personnages */
+        /**
+         * glb personnages
+         */
         this.personnagesGltf = await this.loader.loadGLTF('/glb/personnages/personnages.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
@@ -347,8 +387,82 @@ class Viewer
         })
         console.log('personnages', this.personnagesGltf)
 
+
+        /**
+         * glb outside
+         */
+        this.outsideGltf = await this.loader.loadGLTF('/glb/outside/outside.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.outsideGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedOutsideMaterial
+            }
+        })
+        
+
+        /**
+         * glb tree
+         */
+        this.treeGltf = await this.loader.loadGLTF('/glb/tree/tree.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.treeGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedTreeMaterial
+            }
+        })
+
+
+        /**
+         * glb salon-droite
+         */
+        this.SalonDroiteGltf = await this.loader.loadGLTF('/glb/salon-droite/salon-droite.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.SalonDroiteGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedSalonDroiteMaterial
+            }
+        })
+
+
+        /**
+         * glb salon-gauche
+         */
+        this.SalonGaucheGltf = await this.loader.loadGLTF('/glb/salon-gauche/salon-gauche.glb')
+
+        // appliquer bakeMaterial pour la texture sur tous les meshs
+        this.SalonGaucheGltf.scene.traverse((child) =>
+        {
+            if(child.isMesh)
+            {
+                child.material = this.bakedSalonGaucheMaterial
+            }
+        })
+
+
+
         // Add la scène
-        this.scene.add(this.mainGltf.scene, this.animationsGltf.scene, this.personnagesGltf.scene)
+        this.scene.add
+        (
+            this.animationsGltf.scene, 
+            this.personnagesGltf.scene, 
+
+            this.outsideGltf.scene, 
+            this.treeGltf.scene, 
+
+            this.SalonDroiteGltf.scene, 
+            this.SalonGaucheGltf.scene,
+
+            
+        )
 
         // prépare les clips
         this.mixer = new THREE.AnimationMixer(this.animationsGltf.scene)
