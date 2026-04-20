@@ -567,7 +567,6 @@ class Viewer {
                 child.material = this.bakedPersonnagesMaterial
 
                 if (child.name.includes('G1_SM_perso')) {
-                    child.material.emissive = new THREE.Color('#ffddaa')
                     this.objectsToRaycaster.push(child)
                 }
             }
@@ -907,31 +906,31 @@ class Viewer {
         })
 
 
-        if (clickedMesh.name.includes('persotom')) {
+        if (clickedMesh.name.includes('perso_tom')) {
             document.querySelector('.character-thomas').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('persojulien')) {
+        else if (clickedMesh.name.includes('perso_julien')) {
             document.querySelector('.character-julien').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('persomelanie')) {
+        else if (clickedMesh.name.includes('perso_melanie')) {
             document.querySelector('.character-melanie').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('persoarthur')) {
+        else if (clickedMesh.name.includes('perso_arthur')) {
             document.querySelector('.character-arthur').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('persoanna')) {
+        else if (clickedMesh.name.includes('perso_anna')) {
             document.querySelector('.character-anna').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('persocarla')) {
+        else if (clickedMesh.name.includes('perso_carla')) {
             document.querySelector('.character-carla').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('persosamuel')) {
+        else if (clickedMesh.name.includes('perso_samuel')) {
             document.querySelector('.character-samuel').classList.remove('hidden')
         }
     }
@@ -994,8 +993,8 @@ class Viewer {
         this.directionalLight = new THREE.DirectionalLight('white', 5);
         this.directionalLight.position.set(0, 10, 10)
 
-        /* const helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
-        this.scene.add(helper); */
+        const helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
+        this.scene.add(helper);
 
         // add à la scene
         this.scene.add(this.sunLight, this.directionalLight);
@@ -1156,19 +1155,7 @@ class Viewer {
         }
 
 
-        /**
-         * Glow
-         * code IA pour simuler un shader
-         */
-        // Math.sin crée une vague entre -1 et 1.
-        const glowIntensity = (Math.sin(this.elapsedTime * 1) + 1) / 2 * 0.05 + 0.01
 
-        // On applique cette intensité à tous les personnages de notre tableau
-        for (const perso of this.objectsToRaycaster) {
-            if (perso.material) {
-                perso.material.emissiveIntensity = glowIntensity
-            }
-        }
 
 
         /**
@@ -1190,13 +1177,13 @@ class Viewer {
             this.currentIntersect = intersects[0]
 
             // remove
-             gsap.to(intersects[0].object.scale, {
+            /*  gsap.to(intersects[0].object.scale, {
                  x: 1.05, 
                  y: 1.05,
                  z: 1.05,
                  duration: 0.3,
                  ease: "power2.out"
-             })
+             }) */
         }
         else {
             if (this.currentIntersect) {
@@ -1204,13 +1191,13 @@ class Viewer {
                 document.body.style.cursor = 'default'
 
                 // remove
-                 gsap.to(this.currentIntersect.object.scale, {
+                /*  gsap.to(this.currentIntersect.object.scale, {
                      x: 1, 
                      y: 1,
                      z: 1,
                      duration: 0.3,
                      ease: "power2.out"
-                 })
+                 }) */
 
             }
             this.currentIntersect = null
