@@ -76,7 +76,7 @@ html {
     position: fixed;
 
     pointer-events: none;
-    inset: 0 !important;
+    inset: 0;
 
     backdrop-filter: blur(1rem);
     -webkit-backdrop-filter: blur(1rem);
@@ -120,14 +120,11 @@ html {
 
 
 
-/* instructions */
 .instructions {
     position: fixed;
     z-index: 1000;
-
     top: 2rem;
     left: 2rem;
-
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -136,7 +133,7 @@ html {
 
 
 
-/* dialogues */
+
 .dialogue-box {
     position: absolute;
     left: 50%;
@@ -152,7 +149,6 @@ html {
 
 
 
-/* characters infos*/
 .character-infos {
     position: absolute;
     left: 50%;
@@ -169,7 +165,6 @@ html {
 
 
 
-/* hidden */
 .hidden {
     display: none;
 }
@@ -198,7 +193,6 @@ html {
     transform: translateX(-50%);
 }
 
-/* styles communs aux deux boutons */
 .button_left,
 .button_right {
     display: flex;
@@ -213,7 +207,6 @@ html {
     transition: all 0.3s ease;
 }
 
-/* styles spécifiques */
 .button_left {
     margin-left: 1rem;
 }
@@ -223,13 +216,12 @@ html {
     rotate: 90deg;
 }
 
-/* SVG commun */
+
 .button_left svg path,
 .button_right svg path {
     fill: rgb(255, 255, 255);
 }
 
-/* hover commun */
 .button_left:hover,
 .button_right:hover {
     background-color: rgb(108, 67, 17);
