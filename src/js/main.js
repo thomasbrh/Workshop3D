@@ -983,8 +983,8 @@ class Viewer {
         this.directionalLight = new THREE.DirectionalLight('white', 5);
         this.directionalLight.position.set(0, 10, 10)
 
-        const helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
-        this.scene.add(helper);
+        /* const helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
+        this.scene.add(helper); */
 
         // add à la scene
         this.scene.add(this.sunLight, this.directionalLight);
@@ -1179,13 +1179,13 @@ class Viewer {
             this.currentIntersect = intersects[0]
 
             // remove
-            /*  gsap.to(intersects[0].object.scale, {
+             gsap.to(intersects[0].object.scale, {
                  x: 1.05, 
                  y: 1.05,
                  z: 1.05,
                  duration: 0.3,
                  ease: "power2.out"
-             }) */
+             })
         }
         else {
             if (this.currentIntersect) {
@@ -1193,13 +1193,13 @@ class Viewer {
                 document.body.style.cursor = 'default'
 
                 // remove
-                /*  gsap.to(this.currentIntersect.object.scale, {
+                 gsap.to(this.currentIntersect.object.scale, {
                      x: 1, 
                      y: 1,
                      z: 1,
                      duration: 0.3,
                      ease: "power2.out"
-                 }) */
+                 })
 
             }
             this.currentIntersect = null
