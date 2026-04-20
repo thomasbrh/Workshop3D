@@ -1585,7 +1585,7 @@ class Scene2 {
             this.storyManager.dialogueBox.show("G1: Pourquoi tu as encore utilisé ma brosse à dents !!!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 500)
+            }, 300)
 
             // animation frog
             this.viewer.playClip(2, false)
@@ -1602,7 +1602,7 @@ class Scene2 {
             this.storyManager.dialogueBox.show("P1: Parce qu'elle est mieux peut-être ?!!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 500)
+            }, 300)
 
             return
         }
@@ -1614,7 +1614,7 @@ class Scene2 {
             this.storyManager.dialogueBox.show("G1: C'est pas une raison ! C'est MA brosse à dents, ne t'avises plus de l'utiliser !!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 500)
+            }, 300)
 
             return
         }
@@ -1721,7 +1721,7 @@ class Scene4 {
 
         // camera scène 4
         this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 2, () => {
-            this.storyManager.dialogueBox.show("P1: J'ai superrrr faimmm !!")
+            this.storyManager.dialogueBox.show("P1: Encore toi! C'est la troisième fois que tu voles notre bouffe!")
             setTimeout(() => {
                 this.storyManager.unlock()
             }, 300)
@@ -1735,7 +1735,7 @@ class Scene4 {
             this.storyManager.lock()
             this.step = 1
 
-            this.storyManager.dialogueBox.show("P2: Comme d'habitude ils sont encore en retard...")
+            this.storyManager.dialogueBox.show("G1: Quoi? C'était juste un petit morceau.")
             setTimeout(() => {
                 this.storyManager.unlock()
             }, 300)
@@ -1748,7 +1748,19 @@ class Scene4 {
             this.storyManager.lock()
             this.step = 2
 
-            this.storyManager.dialogueBox.show("P1: J'en ai marre d'attendre, c'est toujours les mêmes !!")
+            this.storyManager.dialogueBox.show("P1: Un petit morceau! T'as bouffé la moitié de nos gâteaux!")
+            setTimeout(() => {
+                this.storyManager.unlock()
+            }, 300)
+
+            return
+        }
+
+        if (this.step === 2) {
+            this.storyManager.lock()
+            this.step = 3
+
+            this.storyManager.dialogueBox.show("P2: La prochaine fois qu'on te chope, on te transforme en cuisses de grenouille !!!!")
             setTimeout(() => {
                 this.storyManager.unlock()
             }, 300)
