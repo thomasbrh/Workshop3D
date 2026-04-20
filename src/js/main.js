@@ -1506,7 +1506,7 @@ class Scene1 {
             this.storyManager.dialogueBox.show("G1: T'es sur que ça va ?")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
         })
     }
 
@@ -1520,7 +1520,7 @@ class Scene1 {
             this.storyManager.dialogueBox.show("G2: Oui ça ma juste blessé..")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
 
             return
         }
@@ -1532,7 +1532,7 @@ class Scene1 {
             this.storyManager.dialogueBox.show("G1: C'est juste un connard, je vais m'en occupé !")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
 
             return
         }
@@ -1544,7 +1544,7 @@ class Scene1 {
             this.storyManager.dialogueBox.show("G2: Non, ne t'inquiètes pas tu risques d'empirer les choses..")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
 
             return
         }
