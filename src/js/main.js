@@ -47,6 +47,7 @@ class SceneLoader {
         this.startBtn = document.querySelector('.start-btn')
         this.instructions = document.querySelector('.instructions')
         this.blurOverlay = document.querySelector('.blur-overlay')
+        this.restartBtn = document.querySelector('.restart-btn')
 
         // l'overlay three.js
         this.setOverlay()
@@ -157,6 +158,16 @@ class SceneLoader {
         this.blurOverlay.classList.add('hidden')
         this.startBtn.classList.add('hidden')
         this.startBtn.disabled = true
+    }
+
+    showRestartUI() {
+        this.blurOverlay.classList.remove('hidden')
+        this.restartBtn.classList.remove('hidden')
+    }
+
+    hideRestartUI() {
+        this.blurOverlay.classList.add('hidden')
+        this.restartBtn.classList.add('hidden')
     }
 
 
@@ -1353,6 +1364,20 @@ class StoryManager {
                 this.iconMute.classList.remove('hidden')
             }
         })
+
+        // btn Restart
+        this.viewer.loader.restartBtn.addEventListener('click', () => {
+            this.viewer.loader.hideRestartUI()
+
+            // reset toutes les animations
+            this.viewer.mixer.stopAllAction()
+
+            // cache le dialogue s'il est encore visible
+            this.dialogueBox.hide()
+
+            // relance l'intro
+            this.goTo('intro')
+        })
     }
 
 
@@ -1445,11 +1470,13 @@ class Intro {
         const action2 = this.viewer.mixer.clipAction(volet1)
 
         action1.reset()
+        action1.timeScale = 1
         action1.setLoop(THREE.LoopOnce, 1)
         action1.clampWhenFinished = true
         action1.play()
 
         action2.reset()
+        action2.timeScale = 1
         action2.setLoop(THREE.LoopOnce, 1)
         action2.clampWhenFinished = true
         action2.play()
@@ -1571,7 +1598,7 @@ class Scene2 {
             this.storyManager.dialogueBox.show("G1: Pourquoi tu as encore utilisé ma brosse à dents !!!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 500)
 
             // animation frog
             this.viewer.playClip(2, false)
@@ -1588,7 +1615,7 @@ class Scene2 {
             this.storyManager.dialogueBox.show("P1: Parce qu'elle est mieux peut-être ?!!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 500)
 
             return
         }
@@ -1600,7 +1627,7 @@ class Scene2 {
             this.storyManager.dialogueBox.show("G1: C'est pas une raison ! C'est MA brosse à dents, ne t'avises plus de l'utiliser !!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 500)
 
             return
         }
@@ -1644,7 +1671,7 @@ class Scene3 {
             this.storyManager.dialogueBox.show("G1: Mais qu'est ce qu'il fait perché la en haut ?")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
         })
     }
 
@@ -1657,7 +1684,7 @@ class Scene3 {
             this.storyManager.dialogueBox.show("G2: Honnêtement je ne sais pas, vraiment bizarre ce peuple..")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
 
             return
         }
@@ -1669,7 +1696,7 @@ class Scene3 {
             this.storyManager.dialogueBox.show("P1: Mais aider-moi à descendre non ?!!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
 
             return
         }
@@ -1710,7 +1737,7 @@ class Scene4 {
             this.storyManager.dialogueBox.show("P1: J'ai superrrr faimmm !!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
         })
     }
 
@@ -1724,7 +1751,7 @@ class Scene4 {
             this.storyManager.dialogueBox.show("P2: Comme d'habitude ils sont encore en retard...")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
 
             return
 
@@ -1737,7 +1764,7 @@ class Scene4 {
             this.storyManager.dialogueBox.show("P1: J'en ai marre d'attendre, c'est toujours les mêmes !!")
             setTimeout(() => {
                 this.storyManager.unlock()
-            }, 1500)
+            }, 300)
 
             return
         }
@@ -1789,6 +1816,12 @@ class Outro {
 
         action1.reset()
         action2.reset()
+
+        // affiche le bouton recommencer après la fermeture des volets
+        const voletDuration = Math.max(volet0.duration, volet1.duration)
+        setTimeout(() => {
+            this.storyManager.viewer.loader.showRestartUI()
+        }, voletDuration * 1000)
 
         // On place la tête de lecture à la toute fin de l'animation
         action1.time = volet0.duration

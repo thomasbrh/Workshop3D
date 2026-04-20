@@ -91,7 +91,8 @@ html {
 
 
 /* start-btn */
-.start-btn {
+.start-btn,
+.restart-btn {
     z-index: 1000;
     position: fixed;
 
@@ -112,7 +113,13 @@ html {
     background-color: rgb(50, 140, 50);
 }
 
-.start-btn.hidden {
+.restart-btn:hover {
+    transform: scale(1.03);
+    background-color: rgb(50, 140, 50);
+}
+
+.start-btn.hidden,
+.restart-btn.hidden {
     display: none;
     pointer-events: none;
     z-index: -1000;
