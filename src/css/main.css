@@ -130,12 +130,17 @@ html {
 .instructions {
     position: fixed;
     z-index: 1000;
-    top: 2rem;
-    left: 2rem;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    color: #FFF;
+
+    padding: 1rem 0.5rem;
+    border-radius: 1rem;
+    background: rgb(0, 0, 0, 0.7);
+    color: white;
 }
 
 
@@ -189,7 +194,7 @@ html {
     left: 50%;
     top: 1rem;
     transform: translateX(-50%);
-    width: 100%;
+    width: calc(100% - 10rem);
     height: 150px;
     z-index: 3;
 }

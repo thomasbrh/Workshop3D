@@ -34,9 +34,11 @@ const threejsOptions =
 /**
  * SCENELOADER CLASS
  */
-class SceneLoader {
+class SceneLoader 
+{
 
-    constructor(scene) {
+    constructor(scene) 
+    {
         // base
         this.scene = scene
         this.progress = 0
@@ -44,10 +46,12 @@ class SceneLoader {
         // DOM
         this.loadingBarElement = document.querySelector('.loading-bar')
         this.loadingBarBgElement = document.querySelector('.loading-bar-bg')
+
         this.startBtn = document.querySelector('.start-btn')
-        this.instructions = document.querySelector('.instructions')
-        this.blurOverlay = document.querySelector('.blur-overlay')
         this.restartBtn = document.querySelector('.restart-btn')
+        this.blurOverlay = document.querySelector('.blur-overlay')
+
+        this.instructions = document.querySelector('.instructions')
 
         // l'overlay three.js
         this.setOverlay()
@@ -59,7 +63,8 @@ class SceneLoader {
         // loading manager
         this.loadingManager = new THREE.LoadingManager()
 
-        this.loadingManager.onProgress = (itemUrl, itemsLoaded, itemsTotal) => {
+        this.loadingManager.onProgress = (itemUrl, itemsLoaded, itemsTotal) => 
+        {
             // calcul la réelle progression 
             this.loadProgress = itemsLoaded / itemsTotal
 
@@ -73,8 +78,10 @@ class SceneLoader {
             this.loadingBarElement.style.transform = `scaleX(${this.progress})`
         }
 
-        this.loadingManager.onLoad = () => {
-            window.setTimeout(() => {
+        this.loadingManager.onLoad = () => 
+        {
+            window.setTimeout(() => 
+            {
                 // passer de 95 à 100 quand c'est loadé
                 this.progress = 1
                 this.loadingBarElement.style.transform = 'scaleX(1)'
@@ -85,10 +92,10 @@ class SceneLoader {
                 // animation gsap qui va enlever la barre 
                 gsap.to(this.overlayMaterial.uniforms.uAlpha,
                     {
-
                         duration: 0,
                         value: 0,
-                        onComplete: () => {
+                        onComplete: () => 
+                        {
                             this.loadingBarElement.classList.add('ended')
                             this.loadingBarBgElement.classList.add('ended')
                         }
@@ -110,7 +117,8 @@ class SceneLoader {
 
 
     // crée l'overlay
-    setOverlay() {
+    setOverlay() 
+    {
         this.overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1)
         // materiel de l'overlay
         this.overlayMaterial = new THREE.ShaderMaterial(
@@ -147,54 +155,63 @@ class SceneLoader {
 
 
     // affiche le blur et startbtn
-    showStartUI() {
+    showStartUI() 
+    {
         this.blurOverlay.classList.remove('hidden')
         this.startBtn.classList.remove('hidden')
     }
 
 
     // cache le blur et startbtn
-    hideStartUI() {
+    hideStartUI() 
+    {
         this.blurOverlay.classList.add('hidden')
         this.startBtn.classList.add('hidden')
         this.startBtn.disabled = true
     }
 
-    showRestartUI() {
+    showRestartUI() 
+    {
         this.blurOverlay.classList.remove('hidden')
         this.restartBtn.classList.remove('hidden')
     }
 
-    hideRestartUI() {
+    hideRestartUI() 
+    {
         this.blurOverlay.classList.add('hidden')
         this.restartBtn.classList.add('hidden')
     }
 
 
-    showInstructions() {
+    showInstructions() 
+    {
         this.instructions.classList.remove('hidden')
     }
 
 
-    hideInstructions() {
+    hideInstructions() 
+    {
         this.instructions.classList.add('hidden')
     }
 
 
     // récupère les chemins pour alimenter this.loadingManager
-    async loadTexture(path) {
+    async loadTexture(path) 
+    {
         return this.textureLoader.load(path)
     }
 
 
     // récupère les chemins pour alimenter this.loadingManager
-    async loadGLTF(path) {
+    async loadGLTF(path) 
+    {
         return await this.gltfLoader.loadAsync(path)
     }
 
 
     // récupère les chemins pour alimenter this.loadingManager
-    async loadAudio(path) {
+    async loadAudio(path) 
+    {
         return await this.audioLoader.loadAsync(path)
     }
 
@@ -205,9 +222,11 @@ class SceneLoader {
 /** 
  * VIEWER CLASS
  */
-class Viewer {
+class Viewer 
+{
 
-    constructor(options) {
+    constructor(options) 
+    {
         // canvas
         this.canvas = options.canvas;
 
@@ -223,16 +242,21 @@ class Viewer {
         this.currentIntersect = null
         this.objectsToRaycaster = []
 
-        window.addEventListener('click', () => {
+        window.addEventListener('click', () => 
+        {
             // On vérifie que le jeu tourne et n'est pas bloqué
-            if (this.storyManager && this.experienceStarted && !this.storyManager.locked) {
-                if (this.currentIntersect) {
+            if (this.storyManager && this.experienceStarted && !this.storyManager.locked) 
+            {
+                if (this.currentIntersect) 
+                {
                     this.characterClick(this.currentIntersect.object)
                 }
-                else {
+                else 
+                {
                     this.characterInfos = document.querySelector('.character-infos')
 
-                    if (this.characterInfos && !this.characterInfos.classList.contains('hidden')) {
+                    if (this.characterInfos && !this.characterInfos.classList.contains('hidden')) 
+                    {
                         this.characterInfos.classList.add('hidden')
                     }
                 }
@@ -252,7 +276,8 @@ class Viewer {
     /**
      * Loading texture
      */
-    async loadTexture() {
+    async loadTexture() 
+    {
         /**
          * texture des animations
          */
@@ -548,7 +573,8 @@ class Viewer {
         this.animationsGltf = await this.loader.loadGLTF('/glb/animations/animations.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.animationsGltf.scene.traverse((child) => {
+        this.animationsGltf.scene.traverse((child) => 
+        {
             if (child.isMesh) {
                 child.material = this.bakedAnimationsMaterial
             }
@@ -562,11 +588,14 @@ class Viewer {
         this.personnagesGltf = await this.loader.loadGLTF('/glb/personnages/personnages.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.personnagesGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.personnagesGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedPersonnagesMaterial
 
-                if (child.name.includes('G1_SM_perso')) {
+                if (child.name.includes('G1_SM_perso')) 
+                {
                     this.objectsToRaycaster.push(child)
                 }
             }
@@ -580,8 +609,10 @@ class Viewer {
         this.outsideGltf = await this.loader.loadGLTF('/glb/outside/outside.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.outsideGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.outsideGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedOutsideMaterial
             }
         })
@@ -593,8 +624,10 @@ class Viewer {
         this.treeGltf = await this.loader.loadGLTF('/glb/tree/tree.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.treeGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.treeGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedTreeMaterial
             }
         })
@@ -606,8 +639,10 @@ class Viewer {
         this.SalonDroiteGltf = await this.loader.loadGLTF('/glb/salon-droite/salon-droite.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.SalonDroiteGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.SalonDroiteGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedSalonDroiteMaterial
             }
         })
@@ -619,8 +654,10 @@ class Viewer {
         this.SalonGaucheGltf = await this.loader.loadGLTF('/glb/salon-gauche/salon-gauche.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.SalonGaucheGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.SalonGaucheGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedSalonGaucheMaterial
             }
         })
@@ -633,8 +670,10 @@ class Viewer {
         this.SdbGaucheGltf = await this.loader.loadGLTF('/glb/salledebain-gauche/douche-gauche.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.SdbGaucheGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.SdbGaucheGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedSdbGaucheMaterial
             }
         })
@@ -643,8 +682,10 @@ class Viewer {
         this.SdbGaucheEvierGltf = await this.loader.loadGLTF('/glb/salledebain-gauche/douche-gauche-evier.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.SdbGaucheEvierGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.SdbGaucheEvierGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedSdbGaucheEvierMaterial
             }
         })
@@ -653,8 +694,10 @@ class Viewer {
         this.SdbGauchePersoGltf = await this.loader.loadGLTF('/glb/salledebain-gauche/douche-gauche-perso.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.SdbGauchePersoGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.SdbGauchePersoGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedSdbGauchePersoMaterial
             }
         })
@@ -666,8 +709,10 @@ class Viewer {
         this.SdbDroiteDoucheGltf = await this.loader.loadGLTF('/glb/salledebain-droite/douche-salledebain-droite.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.SdbDroiteDoucheGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.SdbDroiteDoucheGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedSdbDroiteDoucheMaterial
             }
         })
@@ -676,8 +721,10 @@ class Viewer {
         this.SdbDroiteEvierGltf = await this.loader.loadGLTF('/glb/salledebain-droite/evier-salledebain-droite.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.SdbDroiteEvierGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.SdbDroiteEvierGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedSdbDroiteEvierMaterial
             }
         })
@@ -690,8 +737,10 @@ class Viewer {
         this.GmGaucheMeuble1Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-meuble1.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmGaucheMeuble1Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmGaucheMeuble1Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmGaucheMeuble1Material
             }
         })
@@ -700,8 +749,10 @@ class Viewer {
         this.GmGaucheMeuble2Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-meuble2.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmGaucheMeuble2Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmGaucheMeuble2Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmGaucheMeuble2Material
             }
         })
@@ -710,8 +761,10 @@ class Viewer {
         this.GmGaucheN1Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-n1.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmGaucheN1Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmGaucheN1Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmGaucheN1Material
             }
         })
@@ -720,8 +773,10 @@ class Viewer {
         this.GmGaucheN2Gltf = await this.loader.loadGLTF('/glb/gardemanger-gauche/gardem-gauche-n2.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmGaucheN2Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmGaucheN2Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmGaucheN2Material
             }
         })
@@ -734,8 +789,10 @@ class Viewer {
         this.GmDroiteMeuble1Gltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-meuble1-droite.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmDroiteMeuble1Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmDroiteMeuble1Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmDroiteMeuble1Material
             }
         })
@@ -743,8 +800,10 @@ class Viewer {
         this.GmDroiteMeuble2Gltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-meuble2-droite.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmDroiteMeuble2Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmDroiteMeuble2Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmDroiteMeuble2Material
             }
         })
@@ -752,8 +811,10 @@ class Viewer {
         this.GmDroiteCoffreGltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-coffre-droite.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmDroiteCoffreGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmDroiteCoffreGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmDroiteCoffreMaterial
             }
         })
@@ -761,8 +822,10 @@ class Viewer {
         this.GmDroiteTableGltf = await this.loader.loadGLTF('/glb/gardemanger-droite/gardemanger-droite-table.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.GmDroiteTableGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.GmDroiteTableGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedGmDroiteTableMaterial
             }
         })
@@ -775,8 +838,10 @@ class Viewer {
         this.DortoirGaucheMeubleGltf = await this.loader.loadGLTF('/glb/dortoir-gauche/meubledort-gauche.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.DortoirGaucheMeubleGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.DortoirGaucheMeubleGltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedDortoirGaucheMeubleMaterial
             }
         })
@@ -784,8 +849,10 @@ class Viewer {
         this.DortoirGaucheHammac1Gltf = await this.loader.loadGLTF('/glb/dortoir-gauche/hammac1dort-gauche.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.DortoirGaucheHammac1Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.DortoirGaucheHammac1Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedDortoirGaucheHammac1Material
             }
         })
@@ -794,8 +861,10 @@ class Viewer {
         this.DortoirGaucheHammac2Gltf = await this.loader.loadGLTF('/glb/dortoir-gauche/hammac2dort-gauche.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.DortoirGaucheHammac2Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.DortoirGaucheHammac2Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedDortoirGaucheHammac2Material
             }
         })
@@ -808,8 +877,10 @@ class Viewer {
         this.DortoirDroiteMeubleGltf = await this.loader.loadGLTF('/glb/dortoir-droite/dortoir-meuble-droite.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.DortoirDroiteMeubleGltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.DortoirDroiteMeubleGltf.scene.traverse((child) => 
+            {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedDortoirDroiteMeubleMaterial
             }
         })
@@ -817,8 +888,10 @@ class Viewer {
         this.DortoirDroiteHammac1Gltf = await this.loader.loadGLTF('/glb/dortoir-droite/hammac1-droite-dortoir.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.DortoirDroiteHammac1Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.DortoirDroiteHammac1Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedDortoirDroiteHammac1Material
             }
         })
@@ -827,8 +900,10 @@ class Viewer {
         this.DortoirDroiteHammac2Gltf = await this.loader.loadGLTF('/glb/dortoir-droite/hammac2-droite-dortoir.glb')
 
         // appliquer bakeMaterial pour la texture sur tous les meshs
-        this.DortoirDroiteHammac2Gltf.scene.traverse((child) => {
-            if (child.isMesh) {
+        this.DortoirDroiteHammac2Gltf.scene.traverse((child) => 
+        {
+            if (child.isMesh) 
+            {
                 child.material = this.bakedDortoirDroiteHammac2Material
             }
         })
@@ -887,7 +962,8 @@ class Viewer {
     mouseEvent() {
         this.mouse = new THREE.Vector2();
 
-        window.addEventListener('mousemove', (event) => {
+        window.addEventListener('mousemove', (event) => 
+        {
             this.mouse.x = (event.clientX / settings.sizes.w) * 2 - 1
             this.mouse.y = -(event.clientY / settings.sizes.h) * 2 + 1
         })
@@ -896,41 +972,50 @@ class Viewer {
     /**
      * Personnages DOM
      */
-    characterClick(clickedMesh) {
+    characterClick(clickedMesh) 
+    {
         this.characterInfos = document.querySelector('.character-infos')
         this.characterInfos.classList.remove('hidden')
 
         const allTexts = document.querySelectorAll('.character-text')
-        allTexts.forEach((text) => {
+        allTexts.forEach((text) => 
+        {
             text.classList.add('hidden')
         })
 
 
-        if (clickedMesh.name.includes('perso_tom')) {
+        if (clickedMesh.name.includes('perso_tom')) 
+        {
             document.querySelector('.character-thomas').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('perso_julien')) {
+        else if (clickedMesh.name.includes('perso_julien')) 
+        {
             document.querySelector('.character-julien').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('perso_melanie')) {
+        else if (clickedMesh.name.includes('perso_melanie')) 
+        {
             document.querySelector('.character-melanie').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('perso_arthur')) {
+        else if (clickedMesh.name.includes('perso_arthur')) 
+        {
             document.querySelector('.character-arthur').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('perso_anna')) {
+        else if (clickedMesh.name.includes('perso_anna')) 
+        {
             document.querySelector('.character-anna').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('perso_carla')) {
+        else if (clickedMesh.name.includes('perso_carla')) 
+        {
             document.querySelector('.character-carla').classList.remove('hidden')
         }
 
-        else if (clickedMesh.name.includes('perso_samuel')) {
+        else if (clickedMesh.name.includes('perso_samuel')) 
+        {
             document.querySelector('.character-samuel').classList.remove('hidden')
         }
     }
@@ -939,14 +1024,16 @@ class Viewer {
     /**
      * son
      */
-    setAudio() {
+    setAudio()
+    {
         // ajoute du son à la camera
         this.audioListener = new THREE.AudioListener()
         this.camera.add(this.audioListener)
     }
 
     // musique de fond
-    async loadGlobalAudio() {
+    async loadGlobalAudio() 
+    {
         this.ambienceSound = new THREE.Audio(this.audioListener)
 
         const buffer = await this.loader.loadAudio('/son/ambience/ambience.wav')
@@ -958,7 +1045,8 @@ class Viewer {
 
 
     // bloc play animation animation
-    playClip(index, isInfinite = true) {
+    playClip(index, isInfinite = true) 
+    {
         if (!this.mixer || !this.clips[index])
             return
 
@@ -966,12 +1054,14 @@ class Viewer {
 
         action.reset()
 
-        if (isInfinite) {
+        if (isInfinite) 
+        {
             // loop
             action.setLoop(THREE.LoopRepeat, Infinity)
             action.clampWhenFinished = false
         }
-        else {
+        else 
+        {
             // 1 fois (no loop)
             action.setLoop(THREE.LoopOnce, 1)
             action.clampWhenFinished = true
@@ -984,7 +1074,8 @@ class Viewer {
     /** 
      * populate
      */
-    populate() {
+    populate() 
+    {
         // Tout les éléments à ajouter dans la scene
         // lumière ambiante
         this.sunLight = new THREE.AmbientLight('white', 0.5)
@@ -993,8 +1084,9 @@ class Viewer {
         this.directionalLight = new THREE.DirectionalLight('white', 5);
         this.directionalLight.position.set(0, 10, 10)
 
-        const helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
-        this.scene.add(helper);
+        // debug light
+        /* const helper = new THREE.DirectionalLightHelper(this.directionalLight, 5);
+        this.scene.add(helper); */
 
         // add à la scene
         this.scene.add(this.sunLight, this.directionalLight);
@@ -1007,12 +1099,14 @@ class Viewer {
     /**
      * Render
      */
-    render(scene = this.scene, camera = this.camera) {
+    render(scene = this.scene, camera = this.camera) 
+    {
         this.renderer.render(scene, camera);
     }
 
 
-    setRenderer(options = {}) {
+    setRenderer(options = {}) 
+    {
         this.renderer = new THREE.WebGLRenderer(options);
 
         // Crée notre caméra
@@ -1069,7 +1163,8 @@ class Viewer {
     /**
      * Cameras
      */
-    setCamera(position, target) {
+    setCamera(position, target) 
+    {
         this.camera.position.copy(position)
         this.controls.target.copy(target)
         this.controls.update()
@@ -1078,47 +1173,47 @@ class Viewer {
 
 
     // déplacer les cameras
-    moveCamera(position, target, duration = 1, onComplete = null) {
+    moveCamera(position, target, duration = 1, onComplete = null) 
+    {
         // changer la position
         gsap.to(this.camera.position,
-            {
-                x: position.x,
-                y: position.y,
-                z: position.z,
-                duration,
-                ease: 'power2.inOut'
-            })
+        {
+            x: position.x,
+            y: position.y,
+            z: position.z,
+            duration,
+            ease: 'power2.inOut'
+        })
 
         // changer l'angle de vue
         gsap.to(this.controls.target,
+        {
+            x: target.x,
+            y: target.y,
+            z: target.z,
+            duration,
+            ease: 'power2.inOut',
+            onUpdate: () => 
             {
-                x: target.x,
-                y: target.y,
-                z: target.z,
-                duration,
-                ease: 'power2.inOut',
-                onUpdate: () => {
+                this.controls.update()
+                this.render()
+            },
+            onComplete: () => 
+            {
+                this.controls.update()
+                this.render()
 
-                    this.controls.update()
-                    this.render()
-
-                },
-                onComplete: () => {
-
-                    this.controls.update()
-                    this.render()
-
-                    if (onComplete) onComplete()
-
-                }
-            })
+                if (onComplete) onComplete()
+            }
+        })
     }
 
 
     /**
      * resize
      */
-    resize() {
+    resize() 
+    {
         // Mettre à jour nos settings
         settings.sizes.w = settings.wrapper.clientWidth;
         settings.sizes.h = settings.wrapper.clientHeight;
@@ -1143,19 +1238,20 @@ class Viewer {
     /**
      * AnimationFrame tick
      */
-    tick() {
-
+    tick() 
+    {
         // initialisé l'horloge
         this.delta = this.clock.getDelta()
         this.elapsedTime = this.clock.getElapsedTime()
 
-        // update du mixer/animations
-        if (this.mixer) {
+      
+        /** 
+         * update du mixer/animations
+         */
+        if (this.mixer) 
+        {
             this.mixer.update(this.delta)
         }
-
-
-
 
 
         /**
@@ -1167,38 +1263,39 @@ class Viewer {
         // raycast les objets de notre tableau
         const intersects = this.raycaster.intersectObjects(this.objectsToRaycaster)
 
-        if (intersects.length && intersects[0].distance < 3) {
-            if (this.currentIntersect === null) {
+        if (intersects.length && intersects[0].distance < 3) 
+        {
+            if (this.currentIntersect === null) 
+            {
                 // change le cursor to pointer
                 document.body.style.cursor = 'pointer'
                 console.log("survole de :", intersects[0].object.name)
-
             }
             this.currentIntersect = intersects[0]
 
-            // remove
-            /*  gsap.to(intersects[0].object.scale, {
-                 x: 1.05, 
-                 y: 1.05,
-                 z: 1.05,
-                 duration: 0.3,
-                 ease: "power2.out"
-             }) */
+            gsap.to(intersects[0].object.scale, 
+            {
+                x: 1.05, 
+                y: 1.05,
+                z: 1.05,
+                duration: 0.3,
+                ease: "power2.out"
+            })
         }
         else {
-            if (this.currentIntersect) {
+            if (this.currentIntersect) 
+            {
                 // laisse le cursor default
                 document.body.style.cursor = 'default'
 
-                // remove
-                /*  gsap.to(this.currentIntersect.object.scale, {
-                     x: 1, 
-                     y: 1,
-                     z: 1,
-                     duration: 0.3,
-                     ease: "power2.out"
-                 }) */
-
+                gsap.to(this.currentIntersect.object.scale, 
+                {
+                    x: 1, 
+                    y: 1,
+                    z: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                })
             }
             this.currentIntersect = null
         }
@@ -1216,7 +1313,8 @@ class Viewer {
     /** 
      * Gizmo
      */
-    removeGizmo() {
+    removeGizmo() 
+    {
         if (!this.gizmo) return
 
         this.scene.remove(this.gizmo);
@@ -1226,7 +1324,8 @@ class Viewer {
     }
 
 
-    addGizmo(size = 1) {
+    addGizmo(size = 1) 
+    {
         if (this.gizmo) return
 
         this.gizmo = new THREE.AxesHelper(size);
@@ -1241,21 +1340,25 @@ class Viewer {
 /**
  * DIALOGUE CLASS
  */
-class DialogueBox {
+class DialogueBox 
+{
 
-    constructor() {
+    constructor() 
+    {
         this.box = document.querySelector('.dialogue-box')
         this.text = document.querySelector('.dialogue-text')
     }
 
 
-    show(content) {
+    show(content) 
+    {
         this.text.textContent = content
         this.box.classList.remove('hidden')
     }
 
 
-    hide() {
+    hide() 
+    {
         this.box.classList.add('hidden')
         this.text.textContent = ''
     }
@@ -1267,9 +1370,11 @@ class DialogueBox {
 /**
  * STORYMANAGER CLASS
  */
-class StoryManager {
+class StoryManager 
+{
 
-    constructor(viewer) {
+    constructor(viewer) 
+    {
         // base
         this.viewer = viewer
         this.viewer.storyManager = this
@@ -1294,14 +1399,12 @@ class StoryManager {
 
         this.scenes =
         {
-
             intro: this.intro,
             scene1: this.scene1,
             scene2: this.scene2,
             scene3: this.scene3,
             scene4: this.scene4,
             outro: this.outro
-
         }
 
         // appel des instances
@@ -1309,9 +1412,15 @@ class StoryManager {
     }
 
 
-    bindEvents() {
+    /**
+     * lancement de l'expérience
+     * start-btn
+     */
+    bindEvents() 
+    {
         // écoute si le startbtn est cliqué
-        this.viewer.loader.startBtn.addEventListener('click', () => {
+        this.viewer.loader.startBtn.addEventListener('click', () => 
+        {
             // commence l'expérience si il est cliqué
             if (this.viewer.experienceStarted) return
             this.viewer.experienceStarted = true
@@ -1320,7 +1429,8 @@ class StoryManager {
             this.viewer.audioListener.context.resume()
 
             // lance la muisque d'ambiance
-            if (this.viewer.ambienceSound?.buffer && !this.viewer.ambienceSound.isPlaying) {
+            if (this.viewer.ambienceSound?.buffer && !this.viewer.ambienceSound.isPlaying) 
+            {
                 this.viewer.ambienceSound.play()
             }
 
@@ -1329,22 +1439,26 @@ class StoryManager {
         })
 
         // btn Start
-        this.continueBtn.addEventListener('click', () => {
+        this.continueBtn.addEventListener('click', () => 
+        {
             if (!this.viewer.experienceStarted) return
             if (this.locked) return
             this.currentScene?.interact?.()
         })
 
         // btn Song
-        this.soundToggleBtn.addEventListener('click', () => {
+        this.soundToggleBtn.addEventListener('click', () => 
+        {
             const isMuted = this.soundToggleBtn.dataset.muted === 'true'
-            if (isMuted) {
+            if (isMuted) 
+            {
                 this.viewer.audioListener.setMasterVolume(1)
                 this.soundToggleBtn.dataset.muted = 'false'
                 this.iconMute.classList.add('hidden')
                 this.iconSong.classList.remove('hidden')
             }
-            else {
+            else 
+            {
                 this.viewer.audioListener.setMasterVolume(0)
                 this.soundToggleBtn.dataset.muted = 'true'
                 this.iconSong.classList.add('hidden')
@@ -1353,7 +1467,8 @@ class StoryManager {
         })
 
         // btn Restart
-        this.viewer.loader.restartBtn.addEventListener('click', () => {
+        this.viewer.loader.restartBtn.addEventListener('click', () => 
+        {
             this.viewer.loader.hideRestartUI()
 
             // reset toutes les animations
@@ -1368,8 +1483,10 @@ class StoryManager {
     }
 
 
-    goTo(name) {
-        if (this.currentScene?.exit) {
+    goTo(name) 
+    {
+        if (this.currentScene?.exit) 
+        {
             this.currentScene.exit()
         }
 
@@ -1378,14 +1495,16 @@ class StoryManager {
     }
 
 
-    lock() {
+    lock() 
+    {
         this.locked = true
         this.continueBtn.classList.add('hidden')
         this.viewer.loader.hideInstructions()
     }
 
 
-    unlock() {
+    unlock() 
+    {
         this.locked = false
         this.continueBtn.classList.remove('hidden')
     }
@@ -1399,7 +1518,8 @@ class StoryManager {
  */
 class Intro {
 
-    constructor(viewer, storyManager) {
+    constructor(viewer, storyManager) 
+    {
         // base
         this.viewer = viewer
         this.storyManager = storyManager
@@ -1412,7 +1532,8 @@ class Intro {
     }
 
 
-    async loadAudio() {
+    async loadAudio() 
+    {
         const btnBuffer = await this.viewer.loader.loadAudio('/son/btn/btn-start.wav')
         this.clickBtnSound.setBuffer(btnBuffer)
         this.clickBtnSound.setLoop(false)
@@ -1425,26 +1546,32 @@ class Intro {
     }
 
 
-    enter() {
+    enter() 
+    {
         this.storyManager.lock()
 
         this.viewer.loader.startBtn.disabled = true
         this.viewer.loader.hideStartUI()
+        this.viewer.loader.showInstructions()
 
-        if (this.clickBtnSound.buffer) {
+        if (this.clickBtnSound.buffer) 
+        {
             this.clickBtnSound.play()
         }
 
         this.playOpenVolets()
 
-        setTimeout(() => {
+        setTimeout(() => 
+        {
             this.storyManager.unlock()
-        }, 1800) // cd avant d'enabled les controls
+        }, 1000) // cd avant d'enabled les controls
     }
 
 
-    playOpenVolets() {
-        if (this.voletSound.buffer) {
+    playOpenVolets() 
+    {
+        if (this.voletSound.buffer) 
+        {
             this.voletSound.play()
         }
 
@@ -1470,7 +1597,8 @@ class Intro {
     }
 
 
-    interact() {
+    interact() 
+    {
         this.storyManager.goTo('scene1')
     }
 
@@ -1481,9 +1609,11 @@ class Intro {
 /**
  * SCENE1 CLASS
  */
-class Scene1 {
+class Scene1 
+{
 
-    constructor(viewer, storyManager) {
+    constructor(viewer, storyManager) 
+    {
         // base
         this.viewer = viewer
         this.storyManager = storyManager
@@ -1497,54 +1627,63 @@ class Scene1 {
     }
 
 
-    enter() {
+    enter() 
+    {
         this.storyManager.lock()
         this.step = 0
 
         // camera scène 1
-        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3.5, () => {
+        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3.5, () => 
+        {
             this.storyManager.dialogueBox.show("G1: T'es sur que ça va ?")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
         })
     }
 
 
     interact() {
-        if (this.step === 0) {
+        if (this.step === 0) 
+        {
 
             this.storyManager.lock()
             this.step = 1
 
             this.storyManager.dialogueBox.show("G2: Oui ça ma juste blessé..")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
 
-        if (this.step === 1) {
+        if (this.step === 1) 
+        {
             this.storyManager.lock()
             this.step = 2
 
             this.storyManager.dialogueBox.show("G1: C'est juste un connard, je vais m'en occupé !")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
 
-        if (this.step === 2) {
+        if (this.step === 2) 
+        {
             this.storyManager.lock()
             this.step = 3
 
             this.storyManager.dialogueBox.show("G2: Non, ne t'inquiètes pas tu risques d'empirer les choses..")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
@@ -1560,9 +1699,11 @@ class Scene1 {
 /**
  * SCENE2 CLASS
  */
-class Scene2 {
+class Scene2 
+{
 
-    constructor(viewer, storyManager) {
+    constructor(viewer, storyManager) 
+    {
         // base
         this.viewer = viewer
         this.storyManager = storyManager
@@ -1581,11 +1722,13 @@ class Scene2 {
         this.step = 0
 
         // camera scène 2
-        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 2, () => {
+        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 2, () => 
+        {
             this.storyManager.dialogueBox.show("G1: Pourquoi tu as encore utilisé ma brosse à dents !!!")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             // animation frog
             this.viewer.playClip(2, false)
@@ -1593,28 +1736,33 @@ class Scene2 {
     }
 
 
-    interact() {
+    interact() 
+    {
 
-        if (this.step === 0) {
+        if (this.step === 0) 
+        {
             this.storyManager.lock()
             this.step = 1
 
             this.storyManager.dialogueBox.show("P1: Parce qu'elle est mieux peut-être ?!!")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
 
-        if (this.step === 1) {
+        if (this.step === 1) 
+        {
             this.storyManager.lock()
             this.step = 2
 
             this.storyManager.dialogueBox.show("G1: C'est pas une raison ! C'est MA brosse à dents, ne t'avises plus de l'utiliser !!")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
@@ -1630,9 +1778,11 @@ class Scene2 {
 /**
  * SCENE3 CLASS
  */
-class Scene3 {
+class Scene3 
+{
 
-    constructor(viewer, storyManager) {
+    constructor(viewer, storyManager) 
+    {
         // base
         this.viewer = viewer
         this.storyManager = storyManager
@@ -1646,7 +1796,8 @@ class Scene3 {
     }
 
 
-    enter() {
+    enter() 
+    {
         this.storyManager.lock()
         this.step = 0
         // animation lustre
@@ -1654,11 +1805,13 @@ class Scene3 {
         this.viewer.playClip(4, true)
 
         // camera scène 3
-        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3, () => {
+        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3, () => 
+        {
             this.storyManager.dialogueBox.show("G1: Mais qu'est ce qu'il fait perché la en haut ?")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
         })
     }
 
@@ -1669,9 +1822,10 @@ class Scene3 {
             this.step = 1
 
             this.storyManager.dialogueBox.show("G2: Honnêtement je ne sais pas, vraiment bizarre ce peuple..")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
@@ -1681,9 +1835,10 @@ class Scene3 {
             this.step = 2
 
             this.storyManager.dialogueBox.show("P1: Mais aider-moi à descendre non ?!!")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
@@ -1699,9 +1854,11 @@ class Scene3 {
 /**
  * SCENE4 CLASS
  */
-class Scene4 {
+class Scene4 
+{
 
-    constructor(viewer, storyManager) {
+    constructor(viewer, storyManager) 
+    {
         // base
         this.viewer = viewer
         this.storyManager = storyManager
@@ -1715,55 +1872,65 @@ class Scene4 {
     }
 
 
-    enter() {
+    enter() 
+    {
         this.storyManager.lock()
         this.step = 0
 
         // camera scène 4
-        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 2, () => {
+        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 2, () => 
+        {
             this.storyManager.dialogueBox.show("P1: Encore toi! C'est la troisième fois que tu voles notre bouffe!")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
         })
     }
 
 
-    interact() {
-        if (this.step === 0) {
+    interact() 
+    {
+        if (this.step === 0) 
+        {
 
             this.storyManager.lock()
             this.step = 1
 
             this.storyManager.dialogueBox.show("G1: Quoi? C'était juste un petit morceau.")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
 
         }
 
-        if (this.step === 1) {
+        if (this.step === 1) 
+        {
             this.storyManager.lock()
             this.step = 2
 
             this.storyManager.dialogueBox.show("P1: Un petit morceau! T'as bouffé la moitié de nos gâteaux!")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
 
-        if (this.step === 2) {
+        if (this.step === 2) 
+        {
             this.storyManager.lock()
             this.step = 3
 
             this.storyManager.dialogueBox.show("P2: La prochaine fois qu'on te chope, on te transforme en cuisses de grenouille !!!!")
-            setTimeout(() => {
+            setTimeout(() => 
+            {
                 this.storyManager.unlock()
-            }, 300)
+            }, 250)
 
             return
         }
@@ -1779,9 +1946,11 @@ class Scene4 {
 /**
  * OUTRO CLASS
  */
-class Outro {
+class Outro 
+{
 
-    constructor(viewer, storyManager) {
+    constructor(viewer, storyManager) 
+    {
         // base
         this.viewer = viewer
         this.storyManager = storyManager
@@ -1795,16 +1964,19 @@ class Outro {
     }
 
 
-    enter() {
+    enter() 
+    {
         this.storyManager.lock()
         this.step = 0
-        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3.5, () => {
+        this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3.5, () => 
+        {
             this.playCloseVolets()
         })
     }
 
 
-    playCloseVolets() {
+    playCloseVolets() 
+    {
         if (!this.viewer.mixer || this.viewer.clips.length < 2) return
 
         const volet0 = this.viewer.clips[0]
@@ -1818,7 +1990,8 @@ class Outro {
 
         // affiche le bouton recommencer après la fermeture des volets
         const voletDuration = Math.max(volet0.duration, volet1.duration)
-        setTimeout(() => {
+        setTimeout(() => 
+        {
             this.storyManager.viewer.loader.showRestartUI()
         }, voletDuration * 1000)
 
@@ -1850,7 +2023,8 @@ const myViewer = new Viewer(threejsOptions);
 const storyManager = new StoryManager(myViewer)
 
 // Ajouter un event resize et appeler la fonction qui gère les changements de tailles
-window.addEventListener("resize", () => {
+window.addEventListener("resize", () => 
+{
     myViewer.resize();
 });
 
@@ -1859,14 +2033,17 @@ window.addEventListener("resize", () => {
 /**
  * DEBUG CLASS
  */
-class Debug {
+class Debug 
+{
 
-    constructor() {
+    constructor() 
+    {
         // demande #debug dans le chemin
         this.debugActive = window.location.hash.includes('debug')
 
         // si debug actif
-        if (this.debugActive) {
+        if (this.debugActive) 
+        {
             // objet a debug
             this.debugObject =
             {
@@ -1877,10 +2054,10 @@ class Debug {
 
             // lil-gui
             this.gui = new GUI(
-                {
-                    name: 'debug',
-                    width: 400
-                })
+            {
+                name: 'debug',
+                width: 400
+            })
 
             // spector.js
             this.spector = new Spector()
@@ -1896,11 +2073,13 @@ class Debug {
     /**
      * OrbitControls
      */
-    orbitControlsDebug() {
+    orbitControlsDebug() 
+    {
         this.gui
             .add(this.debugObject, 'orbitControls')
             .name('Orbit controls')
-            .onChange((value) => {
+            .onChange((value) => 
+            {
                 myViewer.controls.enabled = value
                 myViewer.render()
             })
@@ -1910,15 +2089,19 @@ class Debug {
     /**
      * debug guizmo 
      * */
-    guizmoDebug() {
+    guizmoDebug() 
+    {
         this.gui
             .add(this.debugObject, 'gizmo')
             .name('Afficher gizmo')
-            .onChange((value) => {
-                if (value) {
+            .onChange((value) => 
+            {
+                if (value) 
+                {
                     myViewer.addGizmo(2)
                 }
-                else {
+                else 
+                {
                     myViewer.removeGizmo()
                 }
             })
@@ -1928,22 +2111,26 @@ class Debug {
     /**
      * debug camera
      */
-    cameraDebug() {
+    cameraDebug() 
+    {
         // debug camera
         this.cameraFolder = this.gui.addFolder('Camera')
 
         this.cameraFolder.add(this.debugObject.camera.position, 'x').min(-10).max(200).step(0.1)
-            .onChange(() => {
+            .onChange(() => 
+            {
                 myViewer.render()
             })
 
         this.cameraFolder.add(this.debugObject.camera.position, 'y').min(-10).max(200).step(0.1)
-            .onChange(() => {
+            .onChange(() => 
+            {
                 myViewer.render()
             })
 
         this.cameraFolder.add(this.debugObject.camera.position, 'z').min(-10).max(200).step(0.1)
-            .onChange(() => {
+            .onChange(() => 
+            {
                 myViewer.render()
             })
 
@@ -1951,19 +2138,22 @@ class Debug {
         this.targetFolder = this.gui.addFolder('Camera Target')
 
         this.targetFolder.add(myViewer.controls.target, 'x').min(-10).max(10).step(0.1)
-            .onChange(() => {
+            .onChange(() => 
+            {
                 myViewer.controls.update()
                 myViewer.render()
             })
 
         this.targetFolder.add(myViewer.controls.target, 'y').min(-10).max(10).step(0.1)
-            .onChange(() => {
+            .onChange(() => 
+            {
                 myViewer.controls.update()
                 myViewer.render()
             })
 
         this.targetFolder.add(myViewer.controls.target, 'z').min(-10).max(10).step(0.1)
-            .onChange(() => {
+            .onChange(() => 
+            {
                 myViewer.controls.update()
                 myViewer.render()
             })
