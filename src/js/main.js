@@ -64,6 +64,9 @@ class SceneLoader
         // loading manager
         this.loadingManager = new THREE.LoadingManager()
 
+        // attend les async
+        this.loadingManager.itemStart('attente_globale')
+
         this.loadingManager.onProgress = (itemUrl, itemsLoaded, itemsTotal) => 
         {
             // calcul la réelle progression 
@@ -957,6 +960,8 @@ class Viewer
         // prépare les clips
         this.mixer = new THREE.AnimationMixer(this.animationsGltf.scene)
         this.clips = this.animationsGltf.animations
+
+        this.loader.loadingManager.itemEnd('attente_globale')
 
         this.render()
     }
