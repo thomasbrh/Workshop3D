@@ -50,6 +50,7 @@ class SceneLoader
         this.startBtn = document.querySelector('.start-btn')
         this.restartBtn = document.querySelector('.restart-btn')
         this.blurOverlay = document.querySelector('.blur-overlay')
+        this.ui = document.querySelectorAll('.uix')
 
         this.instructions = document.querySelector('.instructions')
 
@@ -159,6 +160,11 @@ class SceneLoader
     {
         this.blurOverlay.classList.remove('hidden')
         this.startBtn.classList.remove('hidden')
+
+        this.ui.forEach((uix) => 
+        {
+            uix.classList.remove('hidden');
+        });
     }
 
 
@@ -244,7 +250,7 @@ class Viewer
 
         window.addEventListener('click', () => 
         {
-            // On vérifie que le jeu tourne et n'est pas bloqué
+            // On vérifie que l'expérience' tourne et n'est pas bloqué
             if (this.storyManager && this.experienceStarted && !this.storyManager.locked) 
             {
                 if (this.currentIntersect) 
@@ -1036,11 +1042,11 @@ class Viewer
     {
         this.ambienceSound = new THREE.Audio(this.audioListener)
 
-        const buffer = await this.loader.loadAudio('/son/ambience/ambience.wav')
+        const buffer = await this.loader.loadAudio('/son/ambience/ambience.mp3')
 
         this.ambienceSound.setBuffer(buffer)
         this.ambienceSound.setLoop(true)
-        this.ambienceSound.setVolume(0.4)
+        this.ambienceSound.setVolume(0.15)
     }
 
 
@@ -1407,10 +1413,32 @@ class StoryManager
             outro: this.outro
         }
 
+        //prépare les sons des btn
+        this.clickBtnSound = new THREE.Audio(this.viewer.audioListener)
+        this.uiClickSound = new THREE.Audio(this.viewer.audioListener)
+        this.loadAudio()
+
         // appel des instances
         this.bindEvents()
     }
 
+
+    /**
+     * charge l'audio des btn
+     */
+    async loadAudio() 
+    {
+        const startBtnBuffer = await this.viewer.loader.loadAudio('/son/btn/btn-start.wav')
+        this.clickBtnSound.setBuffer(startBtnBuffer)
+        this.clickBtnSound.setLoop(false)
+        this.clickBtnSound.setVolume(0.6)
+
+        const uiBtnBuffer = await this.viewer.loader.loadAudio('/son/btn/btn-ui.wav')
+        this.uiClickSound.setBuffer(uiBtnBuffer)
+        this.uiClickSound.setLoop(false)
+        this.uiClickSound.setVolume(0.3)
+    }
+    
 
     /**
      * lancement de l'expérience
@@ -1428,6 +1456,12 @@ class StoryManager
             // autorise l'audio
             this.viewer.audioListener.context.resume()
 
+            // joue le son du btn
+            if (this.clickBtnSound.buffer) 
+            {
+                this.clickBtnSound.play()
+            }
+
             // lance la muisque d'ambiance
             if (this.viewer.ambienceSound?.buffer && !this.viewer.ambienceSound.isPlaying) 
             {
@@ -1438,17 +1472,33 @@ class StoryManager
             this.goTo('intro')
         })
 
-        // btn Start
+        // btn continue / next step
         this.continueBtn.addEventListener('click', () => 
         {
             if (!this.viewer.experienceStarted) return
             if (this.locked) return
+
+            // jouer le son
+            if (this.uiClickSound.buffer) 
+            {
+                if (this.uiClickSound.isPlaying) this.uiClickSound.stop()
+                this.uiClickSound.play()
+            }
+
             this.currentScene?.interact?.()
         })
 
         // btn Song
         this.soundToggleBtn.addEventListener('click', () => 
         {
+
+            // jouer le son
+            if (this.uiClickSound.buffer) 
+            {
+                if (this.uiClickSound.isPlaying) this.uiClickSound.stop()
+                this.uiClickSound.play()
+            }
+
             const isMuted = this.soundToggleBtn.dataset.muted === 'true'
             if (isMuted) 
             {
@@ -1469,8 +1519,14 @@ class StoryManager
         // btn Restart
         this.viewer.loader.restartBtn.addEventListener('click', () => 
         {
-            this.viewer.loader.hideRestartUI()
+            // joue le son du btn
+            if (this.clickBtnSound.buffer) 
+            {
+                this.clickBtnSound.play()
+            }
 
+            this.viewer.loader.hideRestartUI()
+            
             // reset toutes les animations
             this.viewer.mixer.stopAllAction()
 
@@ -1524,7 +1580,7 @@ class Intro {
         this.viewer = viewer
         this.storyManager = storyManager
 
-        this.clickBtnSound = new THREE.Audio(this.viewer.audioListener)
+
         this.voletSound = new THREE.Audio(this.viewer.audioListener)
 
         // appel des instances
@@ -1534,15 +1590,10 @@ class Intro {
 
     async loadAudio() 
     {
-        const btnBuffer = await this.viewer.loader.loadAudio('/son/btn/btn-start.wav')
-        this.clickBtnSound.setBuffer(btnBuffer)
-        this.clickBtnSound.setLoop(false)
-        this.clickBtnSound.setVolume(0.4)
-
         const voletBuffer = await this.viewer.loader.loadAudio('/son/animations/animations-volets.wav')
         this.voletSound.setBuffer(voletBuffer)
         this.voletSound.setLoop(false)
-        this.voletSound.setVolume(1)
+        this.voletSound.setVolume(0.25)
     }
 
 
@@ -1552,19 +1603,14 @@ class Intro {
 
         this.viewer.loader.startBtn.disabled = true
         this.viewer.loader.hideStartUI()
-        this.viewer.loader.showInstructions()
-
-        if (this.clickBtnSound.buffer) 
-        {
-            this.clickBtnSound.play()
-        }
 
         this.playOpenVolets()
+        this.viewer.loader.showInstructions()
 
         setTimeout(() => 
         {
             this.storyManager.unlock()
-        }, 1000) // cd avant d'enabled les controls
+        }, 2000) // cd avant d'enabled les controls
     }
 
 
@@ -1635,11 +1681,11 @@ class Scene1
         // camera scène 1
         this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3.5, () => 
         {
-            this.storyManager.dialogueBox.show("G1: T'es sur que ça va ?")
+            this.storyManager.dialogueBox.show("G1: T'es sûr que ça va ?")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
         })
     }
 
@@ -1651,11 +1697,11 @@ class Scene1
             this.storyManager.lock()
             this.step = 1
 
-            this.storyManager.dialogueBox.show("G2: Oui ça ma juste blessé..")
+            this.storyManager.dialogueBox.show("G2: Oui, ça m'a juste blessé...")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1665,11 +1711,11 @@ class Scene1
             this.storyManager.lock()
             this.step = 2
 
-            this.storyManager.dialogueBox.show("G1: C'est juste un connard, je vais m'en occupé !")
+            this.storyManager.dialogueBox.show("G1: C'est juste un connard, je vais m'en occuper !")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1679,11 +1725,11 @@ class Scene1
             this.storyManager.lock()
             this.step = 3
 
-            this.storyManager.dialogueBox.show("G2: Non, ne t'inquiètes pas tu risques d'empirer les choses..")
+            this.storyManager.dialogueBox.show("G2: Non, ne t'inquiète pas, tu risques d'empirer les choses...")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1728,7 +1774,7 @@ class Scene2
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             // animation frog
             this.viewer.playClip(2, false)
@@ -1744,11 +1790,11 @@ class Scene2
             this.storyManager.lock()
             this.step = 1
 
-            this.storyManager.dialogueBox.show("P1: Parce qu'elle est mieux peut-être ?!!")
+            this.storyManager.dialogueBox.show("P1: Parce qu'elle est mieux peut-être ? !!")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1762,7 +1808,7 @@ class Scene2
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1807,11 +1853,11 @@ class Scene3
         // camera scène 3
         this.viewer.moveCamera(this.cameraPosition, this.cameraTarget, 3, () => 
         {
-            this.storyManager.dialogueBox.show("G1: Mais qu'est ce qu'il fait perché la en haut ?")
+            this.storyManager.dialogueBox.show("G1: Mais qu'est-ce qu'il fait perché là en haut ?")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
         })
     }
 
@@ -1821,11 +1867,11 @@ class Scene3
             this.storyManager.lock()
             this.step = 1
 
-            this.storyManager.dialogueBox.show("G2: Honnêtement je ne sais pas, vraiment bizarre ce peuple..")
+            this.storyManager.dialogueBox.show("G2: Honnêtement je ne sais pas, vraiment bizarre ce peuple...")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1834,11 +1880,11 @@ class Scene3
             this.storyManager.lock()
             this.step = 2
 
-            this.storyManager.dialogueBox.show("P1: Mais aider-moi à descendre non ?!!")
+            this.storyManager.dialogueBox.show("P1: Mais aidez-moi à descendre, non ? !!")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1884,7 +1930,7 @@ class Scene4
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
         })
     }
 
@@ -1897,11 +1943,11 @@ class Scene4
             this.storyManager.lock()
             this.step = 1
 
-            this.storyManager.dialogueBox.show("G1: Quoi? C'était juste un petit morceau.")
+            this.storyManager.dialogueBox.show("G1: Mais quoi? C'était juste un petit morceau, tranquille.")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
 
@@ -1912,11 +1958,11 @@ class Scene4
             this.storyManager.lock()
             this.step = 2
 
-            this.storyManager.dialogueBox.show("P1: Un petit morceau! T'as bouffé la moitié de nos gâteaux!")
+            this.storyManager.dialogueBox.show("P1: Un petit morceau?! T'as bouffé la moitié de nos gâteaux!")
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -1930,7 +1976,7 @@ class Scene4
             setTimeout(() => 
             {
                 this.storyManager.unlock()
-            }, 250)
+            }, 450)
 
             return
         }
@@ -2056,7 +2102,7 @@ class Debug
             this.gui = new GUI(
             {
                 name: 'debug',
-                width: 400
+                width: 450
             })
 
             // spector.js
