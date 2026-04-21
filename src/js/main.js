@@ -1051,7 +1051,7 @@ class Viewer
 
         this.ambienceSound.setBuffer(buffer)
         this.ambienceSound.setLoop(true)
-        this.ambienceSound.setVolume(0.15)
+        this.ambienceSound.setVolume(0.25)
     }
 
 
@@ -1286,9 +1286,9 @@ class Viewer
 
             gsap.to(intersects[0].object.scale, 
             {
-                x: 1.05, 
-                y: 1.05,
-                z: 1.05,
+                x: 1.12, 
+                y: 1.12,
+                z: 1.12,
                 duration: 0.3,
                 ease: "power2.out"
             })
@@ -1436,12 +1436,12 @@ class StoryManager
         const startBtnBuffer = await this.viewer.loader.loadAudio('/son/btn/btn-start.wav')
         this.clickBtnSound.setBuffer(startBtnBuffer)
         this.clickBtnSound.setLoop(false)
-        this.clickBtnSound.setVolume(0.6)
+        this.clickBtnSound.setVolume(0.8)
 
         const uiBtnBuffer = await this.viewer.loader.loadAudio('/son/btn/btn-ui.wav')
         this.uiClickSound.setBuffer(uiBtnBuffer)
         this.uiClickSound.setLoop(false)
-        this.uiClickSound.setVolume(0.3)
+        this.uiClickSound.setVolume(0.5)
     }
     
 
@@ -1598,7 +1598,7 @@ class Intro {
         const voletBuffer = await this.viewer.loader.loadAudio('/son/animations/animations-volets.wav')
         this.voletSound.setBuffer(voletBuffer)
         this.voletSound.setLoop(false)
-        this.voletSound.setVolume(0.25)
+        this.voletSound.setVolume(0.32)
     }
 
 
